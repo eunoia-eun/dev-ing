@@ -1,0 +1,1174 @@
+{
+  "source": "산업안전보건법 시행규칙 [별표 22] 특수건강진단 대상 유해인자 (제201조 관련)",
+  "revision": "개정 2021. 11. 19.",
+  "note": "firstExamMonths(배치 후 첫 특수건강진단 시기), cycleMonths(주기)는 [별표 23] 기준의 분류별 일반 기본값이며, 물질별 세부 주기는 보건관리자가 조정해야 합니다.",
+  "categories": [
+    {
+      "code": "CHEM_ORGANIC",
+      "group": "화학적 인자",
+      "name": "유기화합물",
+      "firstExamMonths": 6,
+      "cycleMonths": 12,
+      "substances": [
+        {
+          "no": 1,
+          "nameKo": "가솔린",
+          "nameEn": "Gasoline",
+          "cas": "8006-61-9"
+        },
+        {
+          "no": 2,
+          "nameKo": "글루타르알데히드",
+          "nameEn": "Glutaraldehyde",
+          "cas": "111-30-8"
+        },
+        {
+          "no": 3,
+          "nameKo": "β-나프틸아민",
+          "nameEn": "β-Naphthylamine",
+          "cas": "91-59-8"
+        },
+        {
+          "no": 4,
+          "nameKo": "니트로글리세린",
+          "nameEn": "Nitroglycerin",
+          "cas": "55-63-0"
+        },
+        {
+          "no": 5,
+          "nameKo": "니트로메탄",
+          "nameEn": "Nitromethane",
+          "cas": "75-52-5"
+        },
+        {
+          "no": 6,
+          "nameKo": "니트로벤젠",
+          "nameEn": "Nitrobenzene",
+          "cas": "98-95-3"
+        },
+        {
+          "no": 7,
+          "nameKo": "p-니트로아닐린",
+          "nameEn": "p-Nitroaniline",
+          "cas": "100-01-6"
+        },
+        {
+          "no": 8,
+          "nameKo": "p-니트로클로로벤젠",
+          "nameEn": "p-Nitrochlorobenzene",
+          "cas": "100-00-5"
+        },
+        {
+          "no": 9,
+          "nameKo": "디니트로톨루엔",
+          "nameEn": "Dinitrotoluene",
+          "cas": "25321-14-6"
+        },
+        {
+          "no": 10,
+          "nameKo": "N,N-디메틸아닐린",
+          "nameEn": "N,N-Dimethylaniline",
+          "cas": "121-69-7"
+        },
+        {
+          "no": 11,
+          "nameKo": "p-디메틸아미노아조벤젠",
+          "nameEn": "p-Dimethylaminoazobenzene",
+          "cas": "60-11-7"
+        },
+        {
+          "no": 12,
+          "nameKo": "N,N-디메틸아세트아미드",
+          "nameEn": "N,N-Dimethylacetamide",
+          "cas": "127-19-5"
+        },
+        {
+          "no": 13,
+          "nameKo": "디메틸포름아미드",
+          "nameEn": "Dimethylformamide",
+          "cas": "68-12-2"
+        },
+        {
+          "no": 14,
+          "nameKo": "디에틸 에테르",
+          "nameEn": "Diethyl ether",
+          "cas": "60-29-7"
+        },
+        {
+          "no": 15,
+          "nameKo": "디에틸렌트리아민",
+          "nameEn": "Diethylenetriamine",
+          "cas": "111-40-0"
+        },
+        {
+          "no": 16,
+          "nameKo": "1,4-디옥산",
+          "nameEn": "1,4-Dioxane",
+          "cas": "123-91-1"
+        },
+        {
+          "no": 17,
+          "nameKo": "디이소부틸케톤",
+          "nameEn": "Diisobutylketone",
+          "cas": "108-83-8"
+        },
+        {
+          "no": 18,
+          "nameKo": "디클로로메탄",
+          "nameEn": "Dichloromethane",
+          "cas": "75-09-2"
+        },
+        {
+          "no": 19,
+          "nameKo": "o-디클로로벤젠",
+          "nameEn": "o-Dichlorobenzene",
+          "cas": "95-50-1"
+        },
+        {
+          "no": 20,
+          "nameKo": "1,2-디클로로에탄",
+          "nameEn": "1,2-Dichloroethane",
+          "cas": "107-06-2"
+        },
+        {
+          "no": 21,
+          "nameKo": "1,2-디클로로에틸렌",
+          "nameEn": "1,2-Dichloroethylene",
+          "cas": "540-59-0"
+        },
+        {
+          "no": 22,
+          "nameKo": "1,2-디클로로프로판",
+          "nameEn": "1,2-Dichloropropane",
+          "cas": "78-87-5"
+        },
+        {
+          "no": 23,
+          "nameKo": "디클로로플루오로메탄",
+          "nameEn": "Dichlorofluoromethane",
+          "cas": "75-43-4"
+        },
+        {
+          "no": 24,
+          "nameKo": "p-디히드록시벤젠",
+          "nameEn": "p-dihydroxybenzene",
+          "cas": "123-31-9"
+        },
+        {
+          "no": 25,
+          "nameKo": "마젠타",
+          "nameEn": "Magenta",
+          "cas": "569-61-9"
+        },
+        {
+          "no": 26,
+          "nameKo": "메탄올",
+          "nameEn": "Methanol",
+          "cas": "67-56-1"
+        },
+        {
+          "no": 27,
+          "nameKo": "2-메톡시에탄올",
+          "nameEn": "2-Methoxyethanol",
+          "cas": "109-86-4"
+        },
+        {
+          "no": 28,
+          "nameKo": "2-메톡시에틸 아세테이트",
+          "nameEn": "2-Methoxyethyl acetate",
+          "cas": "110-49-6"
+        },
+        {
+          "no": 29,
+          "nameKo": "메틸 n-부틸 케톤",
+          "nameEn": "Methyl n-butyl ketone",
+          "cas": "591-78-6"
+        },
+        {
+          "no": 30,
+          "nameKo": "메틸 n-아밀 케톤",
+          "nameEn": "Methyl n-amyl ketone",
+          "cas": "110-43-0"
+        },
+        {
+          "no": 31,
+          "nameKo": "메틸 에틸 케톤",
+          "nameEn": "Methyl ethyl ketone",
+          "cas": "78-93-3"
+        },
+        {
+          "no": 32,
+          "nameKo": "메틸 이소부틸 케톤",
+          "nameEn": "Methyl isobutyl ketone",
+          "cas": "108-10-1"
+        },
+        {
+          "no": 33,
+          "nameKo": "메틸 클로라이드",
+          "nameEn": "Methyl chloride",
+          "cas": "74-87-3"
+        },
+        {
+          "no": 34,
+          "nameKo": "메틸 클로로포름",
+          "nameEn": "Methyl chloroform",
+          "cas": "71-55-6"
+        },
+        {
+          "no": 35,
+          "nameKo": "메틸렌 비스 (페닐 이소시아네이트)",
+          "nameEn": "Methylene bis(phenyl isocyanate)",
+          "cas": "101-68-8"
+        },
+        {
+          "no": 36,
+          "nameKo": "4,4'-메틸렌 비스 (2-클로로아닐린)",
+          "nameEn": "4,4'-Methylene bis(2-chloroaniline)",
+          "cas": "101-14-4"
+        },
+        {
+          "no": 37,
+          "nameKo": "o-메틸시클로헥사논",
+          "nameEn": "o-Methylcyclohexanone",
+          "cas": "583-60-8"
+        },
+        {
+          "no": 38,
+          "nameKo": "메틸시클로헥사놀",
+          "nameEn": "Methylcyclohexanol",
+          "cas": "25639-42-3"
+        },
+        {
+          "no": 39,
+          "nameKo": "무수 말레산",
+          "nameEn": "Maleic anhydride",
+          "cas": "108-31-6"
+        },
+        {
+          "no": 40,
+          "nameKo": "무수 프탈산",
+          "nameEn": "Phthalic anhydride",
+          "cas": "85-44-9"
+        },
+        {
+          "no": 41,
+          "nameKo": "벤젠",
+          "nameEn": "Benzene",
+          "cas": "71-43-2"
+        },
+        {
+          "no": 42,
+          "nameKo": "벤지딘 및 그 염",
+          "nameEn": "Benzidine and its salts",
+          "cas": "92-87-5"
+        },
+        {
+          "no": 43,
+          "nameKo": "1,3-부타디엔",
+          "nameEn": "1,3-Butadiene",
+          "cas": "106-99-0"
+        },
+        {
+          "no": 44,
+          "nameKo": "n-부탄올",
+          "nameEn": "n-Butanol",
+          "cas": "71-36-3"
+        },
+        {
+          "no": 45,
+          "nameKo": "2-부탄올",
+          "nameEn": "2-Butanol",
+          "cas": "78-92-2"
+        },
+        {
+          "no": 46,
+          "nameKo": "2-부톡시에탄올",
+          "nameEn": "2-Butoxyethanol",
+          "cas": "111-76-2"
+        },
+        {
+          "no": 47,
+          "nameKo": "2-부톡시에틸 아세테이트",
+          "nameEn": "2-Butoxyethyl acetate",
+          "cas": "112-07-2"
+        },
+        {
+          "no": 48,
+          "nameKo": "1-브로모프로판",
+          "nameEn": "1-Bromopropane",
+          "cas": "106-94-5"
+        },
+        {
+          "no": 49,
+          "nameKo": "2-브로모프로판",
+          "nameEn": "2-Bromopropane",
+          "cas": "75-26-3"
+        },
+        {
+          "no": 50,
+          "nameKo": "브롬화 메틸",
+          "nameEn": "Methyl bromide",
+          "cas": "74-83-9"
+        },
+        {
+          "no": 51,
+          "nameKo": "비스 (클로로메틸) 에테르 ether",
+          "nameEn": "bis(Chloromethyl",
+          "cas": "542-88-1"
+        },
+        {
+          "no": 52,
+          "nameKo": "사염화탄소",
+          "nameEn": "Carbon tetrachloride",
+          "cas": "56-23-5"
+        },
+        {
+          "no": 53,
+          "nameKo": "스토다드 솔벤트",
+          "nameEn": "Stoddard solvent",
+          "cas": "8052-41-3"
+        },
+        {
+          "no": 54,
+          "nameKo": "스티렌",
+          "nameEn": "Styrene",
+          "cas": "100-42-5"
+        },
+        {
+          "no": 55,
+          "nameKo": "시클로헥사논",
+          "nameEn": "Cyclohexanone",
+          "cas": "108-94-1"
+        },
+        {
+          "no": 56,
+          "nameKo": "시클로헥사놀",
+          "nameEn": "Cyclohexanol",
+          "cas": "108-93-0"
+        },
+        {
+          "no": 57,
+          "nameKo": "시클로헥산",
+          "nameEn": "Cyclohexane",
+          "cas": "110-82-7"
+        },
+        {
+          "no": 58,
+          "nameKo": "시클로헥센",
+          "nameEn": "Cyclohexene",
+          "cas": "110-83-8"
+        },
+        {
+          "no": 59,
+          "nameKo": "아닐린 및 그 동족체",
+          "nameEn": "Aniline and its homologues",
+          "cas": "62-53-3"
+        },
+        {
+          "no": 60,
+          "nameKo": "아세토니트릴",
+          "nameEn": "Acetonitrile",
+          "cas": "75-05-8"
+        },
+        {
+          "no": 61,
+          "nameKo": "아세톤",
+          "nameEn": "Acetone",
+          "cas": "67-64-1"
+        },
+        {
+          "no": 62,
+          "nameKo": "아세트알데히드",
+          "nameEn": "Acetaldehyde",
+          "cas": "75-07-0"
+        },
+        {
+          "no": 63,
+          "nameKo": "아우라민",
+          "nameEn": "Auramine",
+          "cas": "492-80-8"
+        },
+        {
+          "no": 64,
+          "nameKo": "아크릴로니트릴",
+          "nameEn": "Acrylonitrile",
+          "cas": "107-13-1"
+        },
+        {
+          "no": 65,
+          "nameKo": "아크릴아미드",
+          "nameEn": "Acrylamide",
+          "cas": "79-06-1"
+        },
+        {
+          "no": 66,
+          "nameKo": "2-에톡시에탄올",
+          "nameEn": "2-Ethoxyethanol",
+          "cas": "110-80-5"
+        },
+        {
+          "no": 67,
+          "nameKo": "2-에톡시에틸 아세테이트",
+          "nameEn": "2-Ethoxyethyl acetate",
+          "cas": "111-15-9"
+        },
+        {
+          "no": 68,
+          "nameKo": "에틸 벤젠",
+          "nameEn": "Ethyl benzene",
+          "cas": "100-41-4"
+        },
+        {
+          "no": 69,
+          "nameKo": "에틸 아크릴레이트",
+          "nameEn": "Ethyl acrylate",
+          "cas": "140-88-5"
+        },
+        {
+          "no": 70,
+          "nameKo": "에틸렌 글리콜",
+          "nameEn": "Ethylene glycol",
+          "cas": "107-21-1"
+        },
+        {
+          "no": 71,
+          "nameKo": "에틸렌 글리콜 디니트레이트",
+          "nameEn": "Ethylene glycol dinitrate",
+          "cas": "628-96-6"
+        },
+        {
+          "no": 72,
+          "nameKo": "에틸렌 클로로히드린",
+          "nameEn": "Ethylene chlorohydrin",
+          "cas": "107-07-3"
+        },
+        {
+          "no": 73,
+          "nameKo": "에틸렌이민",
+          "nameEn": "Ethyleneimine",
+          "cas": "151-56-4"
+        },
+        {
+          "no": 74,
+          "nameKo": "2,3-에폭시-1-프로판올",
+          "nameEn": "2,3-Epoxy-1-propanol",
+          "cas": "556-52-5"
+        },
+        {
+          "no": 75,
+          "nameKo": "에피클로로히드린",
+          "nameEn": "Epichlorohydrin",
+          "cas": "106-89-8"
+        },
+        {
+          "no": 76,
+          "nameKo": "염소화비페닐",
+          "nameEn": "Polychlorobiphenyls",
+          "cas": "53469-21-9"
+        },
+        {
+          "no": 77,
+          "nameKo": "요오드화 메틸",
+          "nameEn": "Methyl iodide",
+          "cas": "74-88-4"
+        },
+        {
+          "no": 78,
+          "nameKo": "이소부틸 알코올",
+          "nameEn": "Isobutyl alcohol",
+          "cas": "78-83-1"
+        },
+        {
+          "no": 79,
+          "nameKo": "이소아밀 아세테이트",
+          "nameEn": "Isoamyl acetate",
+          "cas": "123-92-2"
+        },
+        {
+          "no": 80,
+          "nameKo": "이소아밀 알코올",
+          "nameEn": "Isoamyl alcohol",
+          "cas": "123-51-3"
+        },
+        {
+          "no": 81,
+          "nameKo": "이소프로필 알코올",
+          "nameEn": "Isopropyl alcohol",
+          "cas": "67-63-0"
+        },
+        {
+          "no": 82,
+          "nameKo": "이황화탄소",
+          "nameEn": "Carbon disulfide",
+          "cas": "75-15-0"
+        },
+        {
+          "no": 83,
+          "nameKo": "콜타르",
+          "nameEn": "Coal tar",
+          "cas": "8007-45-2"
+        },
+        {
+          "no": 84,
+          "nameKo": "크레졸",
+          "nameEn": "Cresol",
+          "cas": "1319-77-3"
+        },
+        {
+          "no": 85,
+          "nameKo": "크실렌",
+          "nameEn": "Xylene",
+          "cas": "1330-20-7"
+        },
+        {
+          "no": 86,
+          "nameKo": "클로로메틸 메틸 에테르",
+          "nameEn": "Chloromethyl methyl ether",
+          "cas": "107-30-2"
+        },
+        {
+          "no": 87,
+          "nameKo": "클로로벤젠",
+          "nameEn": "Chlorobenzene",
+          "cas": "108-90-7"
+        },
+        {
+          "no": 88,
+          "nameKo": "테레빈유",
+          "nameEn": "Turpentine oil",
+          "cas": "8006-64-2"
+        },
+        {
+          "no": 89,
+          "nameKo": "1,1,2,2-테트라클로로에탄",
+          "nameEn": "1,1,2,2-Tetrachloroethane",
+          "cas": "79-34-5"
+        },
+        {
+          "no": 90,
+          "nameKo": "테트라히드로푸란",
+          "nameEn": "Tetrahydrofuran",
+          "cas": "109-99-9"
+        },
+        {
+          "no": 91,
+          "nameKo": "톨루엔",
+          "nameEn": "Toluene",
+          "cas": "108-88-3"
+        },
+        {
+          "no": 92,
+          "nameKo": "톨루엔-2,4-디이소시아네이트",
+          "nameEn": "Toluene-2,4-diisocyanate",
+          "cas": "584-84-9"
+        },
+        {
+          "no": 93,
+          "nameKo": "톨루엔-2,6-디이소시아네이트",
+          "nameEn": "Toluene-2,6-diisocyanate",
+          "cas": "91-08-7"
+        },
+        {
+          "no": 94,
+          "nameKo": "트리클로로메탄",
+          "nameEn": "Trichloromethane",
+          "cas": "67-66-3"
+        },
+        {
+          "no": 95,
+          "nameKo": "1,1,2-트리클로로에탄",
+          "nameEn": "1,1,2-Trichloroethane",
+          "cas": "79-00-5"
+        },
+        {
+          "no": 96,
+          "nameKo": "트리클로로에틸렌",
+          "nameEn": "Trichloroethylene(TCE",
+          "cas": "79-01-6"
+        },
+        {
+          "no": 97,
+          "nameKo": "1,2,3-트리클로로프로판",
+          "nameEn": "1,2,3-Trichloropropane",
+          "cas": "96-18-4"
+        },
+        {
+          "no": 98,
+          "nameKo": "퍼클로로에틸렌",
+          "nameEn": "Perchloroethylene",
+          "cas": "127-18-4"
+        },
+        {
+          "no": 99,
+          "nameKo": "페놀",
+          "nameEn": "Phenol",
+          "cas": "108-95-2"
+        },
+        {
+          "no": 100,
+          "nameKo": "펜타클로로페놀",
+          "nameEn": "Pentachlorophenol",
+          "cas": "87-86-5"
+        },
+        {
+          "no": 101,
+          "nameKo": "포름알데히드",
+          "nameEn": "Formaldehyde",
+          "cas": "50-00-0"
+        },
+        {
+          "no": 102,
+          "nameKo": "β-프로피오락톤",
+          "nameEn": "β-Propiolactone",
+          "cas": "57-57-8"
+        },
+        {
+          "no": 103,
+          "nameKo": "o-프탈로디니트릴",
+          "nameEn": "o-Phthalodinitrile",
+          "cas": "91-15-6"
+        },
+        {
+          "no": 104,
+          "nameKo": "피리딘",
+          "nameEn": "Pyridine",
+          "cas": "110-86-1"
+        },
+        {
+          "no": 105,
+          "nameKo": "헥사메틸렌 디이소시아네이트",
+          "nameEn": "Hexamethylene diisocyanate",
+          "cas": "822-06-0"
+        },
+        {
+          "no": 106,
+          "nameKo": "n-헥산",
+          "nameEn": "n-Hexane",
+          "cas": "110-54-3"
+        },
+        {
+          "no": 107,
+          "nameKo": "n-헵탄",
+          "nameEn": "n-Heptane",
+          "cas": "142-82-5"
+        },
+        {
+          "no": 108,
+          "nameKo": "황산 디메틸",
+          "nameEn": "Dimethyl sulfate",
+          "cas": "77-78-1"
+        },
+        {
+          "no": 109,
+          "nameKo": "히드라진",
+          "nameEn": "Hydrazine",
+          "cas": "302-01-2"
+        }
+      ]
+    },
+    {
+      "code": "CHEM_METAL",
+      "group": "화학적 인자",
+      "name": "금속류",
+      "firstExamMonths": 6,
+      "cycleMonths": 12,
+      "substances": [
+        {
+          "no": 1,
+          "nameKo": "구리 (분진, 미스트, 흄)",
+          "nameEn": "Copper",
+          "cas": "7440-50-8"
+        },
+        {
+          "no": 2,
+          "nameKo": "납 및 그 무기화합물",
+          "nameEn": "Lead and its inorganic compounds",
+          "cas": "7439-92-1"
+        },
+        {
+          "no": 3,
+          "nameKo": "니켈 및 그 무기화합물, 니켈 카르보닐",
+          "nameEn": "Nickel and its inorganic compounds, Nickel carbonyl",
+          "cas": "7440-02-0"
+        },
+        {
+          "no": 4,
+          "nameKo": "망간 및 그 무기화합물",
+          "nameEn": "Manganese and its inorganic compounds",
+          "cas": "7439-96-5"
+        },
+        {
+          "no": 5,
+          "nameKo": "사알킬납",
+          "nameEn": "Tetraalkyl lead",
+          "cas": "78-00-2"
+        },
+        {
+          "no": 6,
+          "nameKo": "산화아연 (분진, 흄)",
+          "nameEn": "Zinc oxide",
+          "cas": "1314-13-2"
+        },
+        {
+          "no": 7,
+          "nameKo": "산화철 (분진, 흄)",
+          "nameEn": "Iron oxide",
+          "cas": "1309-37-1"
+        },
+        {
+          "no": 8,
+          "nameKo": "삼산화비소",
+          "nameEn": "Arsenic trioxide",
+          "cas": "1327-53-3"
+        },
+        {
+          "no": 9,
+          "nameKo": "수은 및 그 화합물",
+          "nameEn": "Mercury and its compounds",
+          "cas": "7439-97-6"
+        },
+        {
+          "no": 10,
+          "nameKo": "안티몬 및 그 화합물",
+          "nameEn": "Antimony and its compounds",
+          "cas": "7440-36-0"
+        },
+        {
+          "no": 11,
+          "nameKo": "알루미늄 및 그 화합물",
+          "nameEn": "Aluminum and its compounds",
+          "cas": "7429-90-5"
+        },
+        {
+          "no": 12,
+          "nameKo": "오산화바나듐 (분진, 흄)",
+          "nameEn": "Vanadium pentoxide",
+          "cas": "1314-62-1"
+        },
+        {
+          "no": 13,
+          "nameKo": "요오드 및 요오드화물",
+          "nameEn": "Iodine and iodides",
+          "cas": "7553-56-2"
+        },
+        {
+          "no": 14,
+          "nameKo": "인듐 및 그 화합물",
+          "nameEn": "Indium and its compounds",
+          "cas": "7440-74-6"
+        },
+        {
+          "no": 15,
+          "nameKo": "주석 및 그 화합물",
+          "nameEn": "Tin and its compounds",
+          "cas": "7440-31-5"
+        },
+        {
+          "no": 16,
+          "nameKo": "지르코늄 및 그 화합물",
+          "nameEn": "Zirconium and its compounds",
+          "cas": "7440-67-7"
+        },
+        {
+          "no": 17,
+          "nameKo": "카드뮴 및 그 화합물",
+          "nameEn": "Cadmium and its compounds",
+          "cas": "7440-43-9"
+        },
+        {
+          "no": 18,
+          "nameKo": "코발트 (분진, 흄)",
+          "nameEn": "Cobalt",
+          "cas": "7440-48-4"
+        },
+        {
+          "no": 19,
+          "nameKo": "크롬 및 그 화합물",
+          "nameEn": "Chromium and its compounds",
+          "cas": "7440-47-3"
+        },
+        {
+          "no": 20,
+          "nameKo": "텅스텐 및 그 화합물",
+          "nameEn": "Tungsten and its compounds",
+          "cas": "7440-33-7"
+        }
+      ]
+    },
+    {
+      "code": "CHEM_ACID_ALKALI",
+      "group": "화학적 인자",
+      "name": "산 및 알카리류",
+      "firstExamMonths": 6,
+      "cycleMonths": 12,
+      "substances": [
+        {
+          "no": 1,
+          "nameKo": "무수 초산",
+          "nameEn": "Acetic anhydride",
+          "cas": "108-24-7"
+        },
+        {
+          "no": 2,
+          "nameKo": "불화수소",
+          "nameEn": "Hydrogen fluoride",
+          "cas": "7664-39-3"
+        },
+        {
+          "no": 3,
+          "nameKo": "시안화 나트륨",
+          "nameEn": "Sodium cyanide",
+          "cas": "143-33-9"
+        },
+        {
+          "no": 4,
+          "nameKo": "시안화 칼륨",
+          "nameEn": "Potassium cyanide",
+          "cas": "151-50-8"
+        },
+        {
+          "no": 5,
+          "nameKo": "염화수소",
+          "nameEn": "Hydrogen chloride",
+          "cas": "7647-01-0"
+        },
+        {
+          "no": 6,
+          "nameKo": "질산",
+          "nameEn": "Nitric acid",
+          "cas": "7697-37-2"
+        },
+        {
+          "no": 7,
+          "nameKo": "트리클로로아세트산",
+          "nameEn": "Trichloroacetic acid",
+          "cas": "76-03-9"
+        },
+        {
+          "no": 8,
+          "nameKo": "황산",
+          "nameEn": "Sulfuric acid",
+          "cas": "7664-93-9"
+        }
+      ]
+    },
+    {
+      "code": "CHEM_GAS",
+      "group": "화학적 인자",
+      "name": "가스 상태 물질류",
+      "firstExamMonths": 6,
+      "cycleMonths": 12,
+      "substances": [
+        {
+          "no": 1,
+          "nameKo": "불소",
+          "nameEn": "Fluorine",
+          "cas": "7782-41-4"
+        },
+        {
+          "no": 2,
+          "nameKo": "브롬",
+          "nameEn": "Bromine",
+          "cas": "7726-95-6"
+        },
+        {
+          "no": 3,
+          "nameKo": "산화에틸렌",
+          "nameEn": "Ethylene oxide",
+          "cas": "75-21-8"
+        },
+        {
+          "no": 4,
+          "nameKo": "삼수소화 비소",
+          "nameEn": "Arsine",
+          "cas": "7784-42-1"
+        },
+        {
+          "no": 5,
+          "nameKo": "시안화 수소",
+          "nameEn": "Hydrogen cyanide",
+          "cas": "74-90-8"
+        },
+        {
+          "no": 6,
+          "nameKo": "염소",
+          "nameEn": "Chlorine",
+          "cas": "7782-50-5"
+        },
+        {
+          "no": 7,
+          "nameKo": "오존",
+          "nameEn": "Ozone",
+          "cas": "10028-15-6"
+        },
+        {
+          "no": 8,
+          "nameKo": "이산화질소",
+          "nameEn": "nitrogen dioxide",
+          "cas": "10102-44-0"
+        },
+        {
+          "no": 9,
+          "nameKo": "이산화황",
+          "nameEn": "Sulfur dioxide",
+          "cas": "7446-09-5"
+        },
+        {
+          "no": 10,
+          "nameKo": "일산화질소",
+          "nameEn": "Nitric oxide",
+          "cas": "10102-43-9"
+        },
+        {
+          "no": 11,
+          "nameKo": "일산화탄소",
+          "nameEn": "Carbon monoxide",
+          "cas": "630-08-0"
+        },
+        {
+          "no": 12,
+          "nameKo": "포스겐",
+          "nameEn": "Phosgene",
+          "cas": "75-44-5"
+        },
+        {
+          "no": 13,
+          "nameKo": "포스핀",
+          "nameEn": "Phosphine",
+          "cas": "7803-51-2"
+        },
+        {
+          "no": 14,
+          "nameKo": "황화수소",
+          "nameEn": "Hydrogen sulfide",
+          "cas": "7783-06-4"
+        }
+      ]
+    },
+    {
+      "code": "CHEM_PERMIT",
+      "group": "화학적 인자",
+      "name": "허가 대상 유해물질",
+      "firstExamMonths": 6,
+      "cycleMonths": 12,
+      "substances": [
+        {
+          "no": 1,
+          "nameKo": "α-나프틸아민 및 그 염",
+          "nameEn": "α-naphthylamine and its salts",
+          "cas": "134-32-7"
+        },
+        {
+          "no": 2,
+          "nameKo": "디아니시딘 및 그 염",
+          "nameEn": "Dianisidine and its salts",
+          "cas": "119-90-4"
+        },
+        {
+          "no": 3,
+          "nameKo": "디클로로벤지딘 및 그 염",
+          "nameEn": "Dichlorobenzidine and its salts",
+          "cas": "91-94-1"
+        },
+        {
+          "no": 4,
+          "nameKo": "베릴륨 및 그 화합물",
+          "nameEn": "Beryllium and its compounds",
+          "cas": "7440-41-7"
+        },
+        {
+          "no": 5,
+          "nameKo": "벤조트리클로라이드",
+          "nameEn": "Benzotrichloride",
+          "cas": "98-07-7"
+        },
+        {
+          "no": 6,
+          "nameKo": "비소 및 그 무기화합물",
+          "nameEn": "Arsenic and its inorganic compounds",
+          "cas": "7440-38-2"
+        },
+        {
+          "no": 7,
+          "nameKo": "염화비닐",
+          "nameEn": "Vinyl chloride",
+          "cas": "75-01-4"
+        },
+        {
+          "no": 8,
+          "nameKo": "콜타르피치 휘발물 (코크스 제조 또는 취급업무)",
+          "nameEn": "Coal tar pitch volatiles",
+          "cas": "65996-93-2"
+        },
+        {
+          "no": 9,
+          "nameKo": "크롬광 가공",
+          "nameEn": "Chromite ore processing",
+          "cas": null
+        },
+        {
+          "no": 10,
+          "nameKo": "크롬산 아연",
+          "nameEn": "Zinc chromates",
+          "cas": "13530-65-9"
+        },
+        {
+          "no": 11,
+          "nameKo": "o-톨리딘 및 그 염",
+          "nameEn": "o-Tolidine and its salts",
+          "cas": "119-93-7"
+        },
+        {
+          "no": 12,
+          "nameKo": "황화니켈류",
+          "nameEn": "Nickel sulfides",
+          "cas": "12035-72-2"
+        }
+      ]
+    },
+    {
+      "code": "CHEM_MWF",
+      "group": "화학적 인자",
+      "name": "금속가공유",
+      "firstExamMonths": 12,
+      "cycleMonths": 12,
+      "substances": [
+        {
+          "no": 1,
+          "nameKo": "미네랄 오일 미스트(광물성 오일)",
+          "nameEn": "Oil mist, mineral",
+          "cas": null
+        }
+      ]
+    },
+    {
+      "code": "DUST",
+      "group": "분진",
+      "name": "분진",
+      "firstExamMonths": 12,
+      "cycleMonths": 24,
+      "substances": [
+        {
+          "no": 1,
+          "nameKo": "곡물 분진",
+          "nameEn": "Grain dusts",
+          "cas": null
+        },
+        {
+          "no": 2,
+          "nameKo": "광물성 분진",
+          "nameEn": "Mineral dusts",
+          "cas": null
+        },
+        {
+          "no": 3,
+          "nameKo": "면 분진",
+          "nameEn": "Cotton dusts",
+          "cas": null
+        },
+        {
+          "no": 4,
+          "nameKo": "목재 분진",
+          "nameEn": "Wood dusts",
+          "cas": null
+        },
+        {
+          "no": 5,
+          "nameKo": "용접 흄",
+          "nameEn": "Welding fume",
+          "cas": null
+        },
+        {
+          "no": 6,
+          "nameKo": "유리 섬유",
+          "nameEn": "Glass fiber dusts",
+          "cas": null
+        },
+        {
+          "no": 7,
+          "nameKo": "석면 분진",
+          "nameEn": "Asbestos dusts",
+          "cas": "1332-21-4"
+        }
+      ]
+    },
+    {
+      "code": "PHYSICAL",
+      "group": "물리적 인자",
+      "name": "물리적 인자",
+      "firstExamMonths": 12,
+      "cycleMonths": 24,
+      "substances": [
+        {
+          "no": 1,
+          "nameKo": "소음(소음·강렬한 소음·충격소음 작업)",
+          "nameEn": "Noise",
+          "cas": null
+        },
+        {
+          "no": 2,
+          "nameKo": "진동(진동작업)",
+          "nameEn": "Vibration",
+          "cas": null
+        },
+        {
+          "no": 3,
+          "nameKo": "방사선",
+          "nameEn": "Ionizing radiation",
+          "cas": null
+        },
+        {
+          "no": 4,
+          "nameKo": "고기압",
+          "nameEn": "High pressure",
+          "cas": null
+        },
+        {
+          "no": 5,
+          "nameKo": "저기압",
+          "nameEn": "Low pressure",
+          "cas": null
+        },
+        {
+          "no": 6,
+          "nameKo": "유해광선 - 자외선",
+          "nameEn": "Ultraviolet",
+          "cas": null
+        },
+        {
+          "no": 7,
+          "nameKo": "유해광선 - 적외선",
+          "nameEn": "Infrared",
+          "cas": null
+        },
+        {
+          "no": 8,
+          "nameKo": "유해광선 - 마이크로파 및 라디오파",
+          "nameEn": "Microwave and radio wave",
+          "cas": null
+        }
+      ]
+    },
+    {
+      "code": "NIGHT_WORK",
+      "group": "야간작업",
+      "name": "야간작업",
+      "firstExamMonths": 12,
+      "cycleMonths": 12,
+      "substances": [
+        {
+          "no": 1,
+          "nameKo": "6개월간 밤 12시~오전 5시 포함 8시간 작업을 월평균 4회 이상",
+          "nameEn": null,
+          "cas": null
+        },
+        {
+          "no": 2,
+          "nameKo": "6개월간 오후 10시~오전 6시 사이 작업을 월평균 60시간 이상",
+          "nameEn": null,
+          "cas": null
+        }
+      ]
+    }
+  ]
+}
