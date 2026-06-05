@@ -13,10 +13,7 @@ const alias = {
   '@test': fileURLToPath(new URL('./test', import.meta.url)),
 };
 
-export default defineConfig(({ command }) => ({
-  // GitHub Pages 프로젝트 페이지(https://eunoia-eun.github.io/dev-ing/)용 하위 경로.
-  // 빌드 때만 '/dev-ing/'을 쓰고, 개발 서버(npm run dev)는 '/'로 둔다.
-  base: command === 'build' ? '/dev-ing/' : '/',
+export default defineConfig({
   plugins: [react()],
   resolve: { alias },
   // 유해인자별 건강장해 데이터(hazardHealthDetails.json)는 동적 import로
@@ -28,4 +25,4 @@ export default defineConfig(({ command }) => ({
     setupFiles: ['./test/harness/setup.ts'],
     include: ['test/**/*.test.{ts,tsx}'],
   },
-}));
+});
