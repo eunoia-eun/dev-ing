@@ -19,6 +19,10 @@
 > 사전 준비: [Node.js](https://nodejs.org) 18 이상 설치
 
 ```bash
+# 0) 저장소 내려받기 (최초 1회)
+git clone https://github.com/eunoia-eun/dev-ing.git "사업장 직원 건강관리"
+cd 사업장\ 직원\ 건강관리
+
 # 1) 의존성 설치 (최초 1회)
 npm install
 
