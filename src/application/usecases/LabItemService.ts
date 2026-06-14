@@ -85,7 +85,7 @@ export class LabItemService {
 
   async update(id: Id, input: NewLabItemInput): Promise<LabItem> {
     const existing = await this.items.getById(id);
-    if (!existing) throw new Error('검사 항목을 찾을 수 없습니다.');
+    if (!existing) throw new Error('검사 항목을 찾을 수 없어요.');
     const updated: LabItem = {
       ...existing,
       name: input.name.trim() || existing.name,
@@ -107,7 +107,7 @@ export class LabItemService {
 
   async remove(id: Id): Promise<void> {
     if (isBuiltinLabItem(id)) {
-      throw new Error('기본 검사 항목은 삭제할 수 없습니다. 대신 "제외"하세요.');
+      throw new Error('기본 검사 항목은 삭제할 수 없어요. 대신 "제외"하세요.');
     }
     await this.items.remove(id);
   }

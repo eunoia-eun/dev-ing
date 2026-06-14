@@ -39,7 +39,7 @@ export class DepartmentService {
     const trimmed = name.trim();
     if (!trimmed) throw new Error('부서명을 입력하세요.');
     const all = await this.departments.list();
-    if (all.some((d) => d.name === trimmed)) throw new Error('이미 존재하는 부서명입니다.');
+    if (all.some((d) => d.name === trimmed)) throw new Error('이미 존재하는 부서명이에요.');
     const department: Department = { id: this.ids.next(), name: trimmed, note: note?.trim() || undefined };
     await this.departments.save(department);
     return department;
@@ -50,10 +50,10 @@ export class DepartmentService {
     const trimmed = name.trim();
     if (!trimmed) throw new Error('부서명을 입력하세요.');
     const dept = await this.departments.getById(id);
-    if (!dept) throw new Error('부서를 찾을 수 없습니다.');
+    if (!dept) throw new Error('부서를 찾을 수 없어요.');
     const all = await this.departments.list();
     if (all.some((d) => d.id !== id && d.name === trimmed)) {
-      throw new Error('이미 존재하는 부서명입니다.');
+      throw new Error('이미 존재하는 부서명이에요.');
     }
     const oldName = dept.name;
     const updated: Department = { ...dept, name: trimmed, note: note?.trim() || undefined };
@@ -75,7 +75,7 @@ export class DepartmentService {
     const emps = await this.employees.list();
     const count = emps.filter((e) => e.active && e.department === dept.name).length;
     if (count > 0) {
-      throw new Error(`소속 임직원이 ${count}명 있어 삭제할 수 없습니다. 먼저 이동하거나 제외하세요.`);
+      throw new Error(`소속 임직원이 ${count}명 있어 삭제할 수 없어요. 먼저 이동하거나 제외하세요.`);
     }
     await this.departments.remove(id);
   }

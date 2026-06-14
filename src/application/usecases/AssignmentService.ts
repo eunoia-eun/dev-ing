@@ -81,7 +81,7 @@ export class AssignmentService {
     if (!input.effectiveDate) throw new Error('변경(발령)일을 입력하세요.');
 
     const employee = await this.employees.getById(input.employeeId);
-    if (!employee) throw new Error('임직원을 찾을 수 없습니다.');
+    if (!employee) throw new Error('임직원을 찾을 수 없어요.');
 
     const timeline = await this.ensure(input.employeeId);
     const dayBefore = addDays(input.effectiveDate, -1);
@@ -132,7 +132,7 @@ export class AssignmentService {
   /** 배치 기록 직접 종료(수정용) */
   async endAssignment(id: string, endDate?: ISODate): Promise<void> {
     const a = await this.assignments.getById(id);
-    if (!a) throw new Error('배치 기록을 찾을 수 없습니다.');
+    if (!a) throw new Error('배치 기록을 찾을 수 없어요.');
     await this.assignments.save({ ...a, endDate: endDate ?? this.clock.today() });
   }
 }

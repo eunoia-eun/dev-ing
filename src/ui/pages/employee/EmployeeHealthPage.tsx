@@ -277,7 +277,7 @@ function SymptomRecordModal({
       </div>
 
       <div className="alert alert--info" style={{ marginBottom: 0 }}>
-        💡 기재한 내용은 보건관리자가 확인해요. 유해인자 노출과 연관성이 발견되면 함께 기록됩니다.
+        💡 기재한 내용은 보건관리자가 확인해요. 유해인자 노출과 연관성이 발견되면 함께 기록돼요.
       </div>
     </Modal>
   );

@@ -238,7 +238,7 @@ function CheckupFindingsCard({ dimension }: { dimension: StatDimension }) {
           </div>
 
           {s.examined === 0 ? (
-            <EmptyState icon="🩺">해당 기준의 검진 기록이 없습니다.</EmptyState>
+            <EmptyState icon="🩺">해당 기준의 검진 기록이 없어요.</EmptyState>
           ) : (
             <div className="table-wrap" style={{ border: 'none' }}>
               <table className="table table--grid">
@@ -469,7 +469,7 @@ function ExposureStatsCard({ dimension }: { dimension: StatDimension }) {
         <ErrorAlert message={stats.error} />
       ) : !s ? null : s.totalExposed === 0 ? (
         <div className="card__body">
-          <EmptyState icon="⚗️">진행 중인 노출 기록이 없습니다.</EmptyState>
+          <EmptyState icon="⚗️">진행 중인 노출 기록이 없어요.</EmptyState>
         </div>
       ) : (
         <div className="card__body stack">
@@ -694,7 +694,7 @@ function SymptomTrendCard({ dimension }: { dimension: StatDimension }) {
     >
       {opts.length === 0 ? (
         <div className="card__body">
-          <EmptyState icon="🩺">기록된 증상이 없습니다.</EmptyState>
+          <EmptyState icon="🩺">기록된 증상이 없어요.</EmptyState>
         </div>
       ) : trend.loading ? (
         <Spinner />
@@ -723,7 +723,7 @@ function MatrixSection({
   if (matrix.grandTotal === 0) {
     return (
       <div className="card__body">
-        <EmptyState icon="📊">해당 기간에 기록이 없습니다.</EmptyState>
+        <EmptyState icon="📊">해당 기간에 기록이 없어요.</EmptyState>
       </div>
     );
   }

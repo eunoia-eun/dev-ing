@@ -6,7 +6,7 @@ import { App } from './ui/App';
 import './ui/styles/global.css';
 
 const root = document.getElementById('root');
-if (!root) throw new Error('#root 요소를 찾을 수 없습니다.');
+if (!root) throw new Error('#root 요소를 찾을 수 없어요.');
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>

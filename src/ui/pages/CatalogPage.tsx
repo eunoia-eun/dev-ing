@@ -72,7 +72,7 @@ export function CatalogPage() {
   }
 
   async function unlink(m: DepartmentHazardView) {
-    if (!window.confirm(`${m.department}의 '${m.substanceName}' 매핑을 삭제할까요?\n(이미 등록된 임직원 노출 기록은 유지됩니다)`)) return;
+    if (!window.confirm(`${m.department}의 '${m.substanceName}' 매핑을 삭제할까요?\n(이미 등록된 임직원 노출 기록은 유지돼요)`)) return;
     setBusy(true);
     try {
       await hazard.unlinkDepartmentHazard(m.id);
@@ -179,7 +179,7 @@ export function CatalogPage() {
             <Spinner />
           ) : filteredDeptHaz.length === 0 ? (
             <EmptyState icon="🏭">
-              묶인 부서 유해인자가 없습니다. ‘＋ 유해인자 추가’로 부서의 공정 유해인자를 등록하세요.
+              묶인 부서 유해인자가 없어요. ‘＋ 유해인자 추가’로 부서의 공정 유해인자를 등록해 보세요.
             </EmptyState>
           ) : (
             <div className="table-wrap" style={{ border: 'none' }}>
@@ -248,7 +248,7 @@ export function CatalogPage() {
                                       <button
                                         className="btn btn--sm"
                                         disabled={m.employeeCount === 0 || busy}
-                                        title={m.employeeCount === 0 ? '해당 부서 임직원이 없습니다' : '이 부서 임직원에게 노출 일괄 등록'}
+                                        title={m.employeeCount === 0 ? '해당 부서에 임직원이 없어요' : '이 부서 임직원에게 노출 일괄 등록'}
                                         onClick={() => applyOne(m)}
                                       >
                                         임직원 적용
@@ -264,7 +264,7 @@ export function CatalogPage() {
                                     <td colSpan={4} style={{ background: 'var(--surface)' }}>
                                       {m.appliedEmployees.length === 0 ? (
                                         <span className="muted small">
-                                          진행 중 노출로 등록된 임직원이 없습니다. ‘임직원 적용’으로 등록하세요.
+                                          진행 중 노출로 등록된 임직원이 없어요. ‘임직원 적용’으로 등록해 보세요.
                                         </span>
                                       ) : (
                                         <div className="row row--wrap" style={{ gap: 6, alignItems: 'center' }}>
@@ -299,7 +299,7 @@ export function CatalogPage() {
           )}
           <div className="muted small" style={{ marginTop: 8 }}>
             ※ ‘적용 현황(n/n명)’을 누르면 해당 유해인자에 노출된 임직원 명단이 펼쳐지고, 이름을 누르면 건강명부로
-            이동합니다. ‘임직원 적용’은 그 부서 임직원에게 노출을 일괄 등록(이미 등록된 사람은 건너뜀)합니다.
+            이동해요. ‘임직원 적용’은 그 부서 임직원에게 노출을 일괄 등록해요(이미 등록된 사람은 건너뜀).
           </div>
         </Card>
       )}
@@ -308,7 +308,7 @@ export function CatalogPage() {
       {search.trim() !== '' ? (
         <Card title={`검색 결과 (${results.length})`} bodyClassName="">
           {results.length === 0 ? (
-            <EmptyState icon="🔍">검색 결과가 없습니다.</EmptyState>
+            <EmptyState icon="🔍">검색 결과가 없어요.</EmptyState>
           ) : (
             <ul className="list-reset">
               {results.map(({ category: c, substance: s }) => (
@@ -368,7 +368,7 @@ export function CatalogPage() {
         <>
           <div className="muted small">
             {catalog.source} · {catalog.revision}. 분류를 선택하면 물질 목록과 건강장해 상세를 볼 수
-            있습니다.
+            있어요.
           </div>
           <div className="grid grid--stats">
             {catalog.categories.map((c) => (
@@ -517,7 +517,7 @@ function AddDeptHazardModal({
             ))}
             {results.length === 0 && (
               <li className="muted small" style={{ padding: 8 }}>
-                검색 결과가 없습니다.
+                검색 결과가 없어요.
               </li>
             )}
           </ul>

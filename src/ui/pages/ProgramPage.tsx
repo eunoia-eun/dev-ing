@@ -54,7 +54,7 @@ export function ProgramPage() {
       </div>
 
       {summaries.data!.length === 0 ? (
-        <EmptyState icon="🏃">조회 기간에 운영하는 프로그램이 없습니다.</EmptyState>
+        <EmptyState icon="🏃">조회 기간에 운영하는 프로그램이 없어요.</EmptyState>
       ) : (
         <div className="grid grid--2">
           {summaries.data!.map(({ program: p, summary }) => (
@@ -105,12 +105,12 @@ function ProgramFormModal({
 
   async function submit() {
     if (!title || !category || !startDate || !endDate) {
-      setError('제목·분류·시작일·종료일은 필수입니다.');
+      setError('제목·분류·시작일·종료일을 모두 입력해 주세요.');
       return;
     }
     const cap = Number(capacity);
     if (!Number.isFinite(cap) || cap <= 0) {
-      setError('정원은 1 이상의 숫자여야 합니다.');
+      setError('정원은 1 이상의 숫자로 입력해 주세요.');
       return;
     }
     setBusy(true);
@@ -225,7 +225,7 @@ function ProgramCard({
   const candidates = employees.filter((e) => !enrolledIds.has(e.id));
 
   async function remove() {
-    if (!confirm(`'${p.title}' 프로그램을 삭제하시겠습니까? 신청·참여 기록도 함께 삭제됩니다.`)) return;
+    if (!confirm(`'${p.title}' 프로그램을 삭제할까요? 신청·참여 기록도 함께 삭제돼요.`)) return;
     await programService.removeProgram(p.id);
     onChanged();
   }
@@ -301,7 +301,7 @@ function ProgramCard({
       {enrollments.loading ? (
         <Spinner />
       ) : (enrollments.data?.length ?? 0) === 0 ? (
-        <div className="muted small">아직 신청자가 없습니다.</div>
+        <div className="muted small">아직 신청자가 없어요.</div>
       ) : (
         <div className="table-wrap">
           <table className="table">

@@ -54,7 +54,7 @@ function SymptomHazardPanel({ employeeId, symptoms }: { employeeId: string; symp
 
   const checks = data ?? [];
   if (checks.length === 0) {
-    return <div className="muted small hazard-check__hint">이 임직원은 등록된 노출 유해인자가 없습니다.</div>;
+    return <div className="muted small hazard-check__hint">이 임직원은 등록된 노출 유해인자가 없어요.</div>;
   }
 
   const related = checks.filter((c) => c.matchedSymptoms.length > 0);
@@ -64,12 +64,12 @@ function SymptomHazardPanel({ employeeId, symptoms }: { employeeId: string; symp
     <div className="hazard-check">
       {related.length > 0 ? (
         <div className="alert alert--danger" style={{ marginBottom: 8 }}>
-          ⚠ 노출 유해인자와 <strong>관련 가능성</strong>이 있는 증상입니다. 특수건강진단·추가 평가를
-          고려하세요.
+          ⚠ 노출 유해인자와 <strong>관련 가능성</strong>이 있는 증상이에요. 특수건강진단·추가 평가를
+          고려해 보세요.
         </div>
       ) : symptoms.length > 0 ? (
         <div className="muted small" style={{ marginBottom: 8 }}>
-          입력한 증상과 노출 유해인자의 직접 관련 소견은 없습니다.
+          입력한 증상과 노출 유해인자의 직접 관련 소견은 없어요.
         </div>
       ) : (
         <div className="muted small" style={{ marginBottom: 8 }}>
@@ -93,7 +93,7 @@ function SymptomHazardPanel({ employeeId, symptoms }: { employeeId: string; symp
         ))}
       </div>
       <div className="muted small" style={{ marginTop: 8 }}>
-        참고용 점검이며 진단을 대체하지 않습니다.
+        참고용 점검으로, 진단을 대신할 수는 없어요.
       </div>
     </div>
   );
@@ -284,7 +284,7 @@ export function SymptomPage() {
             ))}
           </div>
           <div className="muted small" style={{ marginTop: 10 }}>
-            같은 부서에서 2회 이상 나타난 증상입니다. 공통 작업환경 요인 점검에 참고하세요.
+            같은 부서에서 2회 이상 나타난 증상이에요. 공통 작업환경 요인 점검에 참고해 보세요.
           </div>
         </Card>
       )}
@@ -295,7 +295,7 @@ export function SymptomPage() {
         ) : visits.error ? (
           <ErrorAlert message={visits.error} />
         ) : displayedVisits.length === 0 ? (
-          <EmptyState icon="🩺">해당 조건의 상담 기록이 없습니다.</EmptyState>
+          <EmptyState icon="🩺">해당 조건의 상담 기록이 없어요.</EmptyState>
         ) : (
           <div className="table-wrap" style={{ border: 'none' }}>
             <table className="table">

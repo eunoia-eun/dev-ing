@@ -71,11 +71,11 @@ export function AccountSettingsPage() {
     setPwError(null);
     setPwSuccess(false);
     if (newPw !== confirmPw) {
-      setPwError('새 비밀번호가 일치하지 않습니다.');
+      setPwError('새 비밀번호가 일치하지 않아요.');
       return;
     }
     if (newPw.length < 6) {
-      setPwError('새 비밀번호는 6자 이상이어야 합니다.');
+      setPwError('새 비밀번호는 6자 이상으로 입력해 주세요.');
       return;
     }
     setBusy(true);
@@ -97,7 +97,7 @@ export function AccountSettingsPage() {
     setResetMsg(null);
     try {
       await auth.resetEmployeePassword(employeeId);
-      setResetMsg({ id: employeeId, msg: '생년월일로 초기화되었습니다.' });
+      setResetMsg({ id: employeeId, msg: '생년월일로 초기화됐어요.' });
       accounts.reload();
     } catch (e) {
       setResetMsg({ id: employeeId, msg: e instanceof Error ? e.message : String(e) });
@@ -177,7 +177,7 @@ export function AccountSettingsPage() {
               )}
               {phoneSuccess && (
                 <div className="alert alert--success" style={{ marginTop: 8 }}>
-                  ✅ 연락처가 저장되었습니다.
+                  ✅ 연락처가 저장됐어요.
                 </div>
               )}
             </>
@@ -227,7 +227,7 @@ export function AccountSettingsPage() {
 
           {pwError && <ErrorAlert message={pwError} />}
           {pwSuccess && (
-            <div className="alert alert--success">✅ 비밀번호가 변경되었습니다.</div>
+            <div className="alert alert--success">✅ 비밀번호가 변경됐어요.</div>
           )}
 
           <button
@@ -248,7 +248,7 @@ export function AccountSettingsPage() {
             👥 임직원 계정 관리
           </h3>
           <p style={{ margin: '0 0 12px', fontSize: 12, color: '#9ca3af' }}>
-            비밀번호를 생년월일(YYYYMMDD)로 초기화할 수 있습니다.
+            비밀번호를 생년월일(YYYYMMDD)로 초기화할 수 있어요.
           </p>
 
           {empList.loading ? (

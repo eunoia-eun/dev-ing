@@ -29,7 +29,7 @@ export function LineChart({
   const ih = height - padT - padB;
 
   const nums = points.map((p) => p.value).filter((v): v is number => v != null);
-  if (nums.length === 0) return <div className="muted small">표시할 수치가 없습니다.</div>;
+  if (nums.length === 0) return <div className="muted small">표시할 수치가 없어요.</div>;
 
   let min = Math.min(...nums, ...(refLow != null ? [refLow] : []));
   let max = Math.max(...nums, ...(refHigh != null ? [refHigh] : []));

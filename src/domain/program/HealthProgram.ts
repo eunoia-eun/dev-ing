@@ -73,7 +73,7 @@ export function decideEnrollmentStatus(
   currentOccupiedSeats: number,
 ): EnrollmentStatus {
   if (program.status === 'closed') {
-    throw new Error('종료된 프로그램에는 신청할 수 없습니다.');
+    throw new Error('종료된 프로그램에는 신청할 수 없어요.');
   }
   return currentOccupiedSeats < program.capacity ? 'enrolled' : 'waitlisted';
 }

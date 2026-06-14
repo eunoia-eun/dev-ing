@@ -76,7 +76,7 @@ export function EmployeeProfilePage() {
       </div>
 
       {!selectedId ? (
-        <EmptyState icon="🧑‍⚕️">임직원을 선택하면 통합 건강 프로필이 표시됩니다.</EmptyState>
+        <EmptyState icon="🧑‍⚕️">임직원을 선택하면 통합 건강 프로필이 표시돼요.</EmptyState>
       ) : prof.loading ? (
         <Spinner />
       ) : prof.error ? (
@@ -369,7 +369,7 @@ function ProfileView({
       >
         {assignments.length === 0 && exposures.length === 0 ? (
           <div className="empty">
-            <span className="ico">🗂️</span>배치·노출 이력이 없습니다.
+            <span className="ico">🗂️</span>배치·노출 이력이 없어요.
           </div>
         ) : (
           <div className="table-wrap" style={{ border: 'none' }}>
@@ -518,7 +518,7 @@ function ProfileView({
       >
         {checkups.length === 0 ? (
           <div className="empty">
-            <span className="ico">🩺</span>건강검진 기록이 없습니다.
+            <span className="ico">🩺</span>건강검진 기록이 없어요.
           </div>
         ) : (
           <div className="table-wrap" style={{ border: 'none' }}>
@@ -719,12 +719,12 @@ function ChangeAssignmentModal({
         {error && <ErrorAlert message={error} />}
         <div className="alert alert--info">
           진행 중 노출 <strong>{result.endedExposures}건</strong>을 {formatDate(effectiveDate)} 전날로 종료하고,{' '}
-          <strong>{department}</strong> 배치를 시작했습니다.
+          <strong>{department}</strong> 배치를 시작했어요.
         </div>
         {result.suggestions.length === 0 ? (
           <div className="muted small">
-            {department}에 매핑된 유해인자가 없습니다. (유해인자 카탈로그 → 부서별 유해인자에서 먼저 묶어두면
-            다음부터 자동 제안됩니다.)
+            {department}에 매핑된 유해인자가 없어요. (유해인자 카탈로그 → 부서별 유해인자에서 먼저 묶어두면
+            다음부터 자동으로 제안돼요.)
           </div>
         ) : (
           <>
@@ -746,7 +746,7 @@ function ChangeAssignmentModal({
               })}
             </div>
             <div className="muted small" style={{ marginTop: 8 }}>
-              선택한 유해인자는 {formatDate(effectiveDate)}부터 노출 시작으로 등록됩니다.
+              선택한 유해인자는 {formatDate(effectiveDate)}부터 노출 시작으로 등록돼요.
             </div>
           </>
         )}
@@ -774,7 +774,7 @@ function ChangeAssignmentModal({
       <div className="alert alert--info">
         현재: <strong>{currentDepartment}</strong> · {currentJobTitle}
         <div className="muted small">
-          변경하면 이전 배치와 진행 중 노출이 변경일 전날로 자동 종료되고, 새 부서 유해인자를 제안합니다.
+          변경하면 이전 배치와 진행 중 노출이 변경일 전날로 자동 종료되고, 새 부서 유해인자를 제안해요.
         </div>
       </div>
       <div className="form-row">
@@ -1006,12 +1006,12 @@ function LabTrendCard({
     >
       {trend.columns.length === 0 ? (
         <div className="empty">
-          <span className="ico">📈</span>해당 기간에 검사 수치 기록이 없습니다.
+          <span className="ico">📈</span>해당 기간에 검사 수치 기록이 없어요.
         </div>
       ) : view === 'graph' ? (
         <div className="card__body">
           {numericRows.length === 0 ? (
-            <div className="muted small">그래프로 표시할 수치 항목이 없습니다.</div>
+            <div className="muted small">그래프로 표시할 수치 항목이 없어요.</div>
           ) : (
             <>
               <div className="toolbar">
@@ -1036,7 +1036,7 @@ function LabTrendCard({
                 refHigh={selectedRow?.def?.refHigh}
               />
               <div className="muted small" style={{ marginTop: 6 }}>
-                초록 음영은 정상범위, 빨간 점은 범위를 벗어난 값입니다.
+                초록 음영은 정상범위, 빨간 점은 범위를 벗어난 값이에요.
               </div>
             </>
           )}
@@ -1523,7 +1523,7 @@ function LabItemManagerModal({
       {error && <ErrorAlert message={error} />}
       <div className="alert alert--info">
         ⠿ 손잡이를 잡고 <strong>드래그</strong>해 순서를 바꾸고, 체크 해제로 입력 폼에서{' '}
-        <strong>제외</strong>(기록 보존). 직접 추가한 항목만 삭제할 수 있습니다.
+        <strong>제외</strong>(기록 보존). 직접 추가한 항목만 삭제할 수 있어요.
       </div>
 
       <div className="table-wrap" style={{ maxHeight: 280, marginBottom: 16 }}>

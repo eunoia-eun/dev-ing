@@ -69,7 +69,7 @@ export function DashboardPage() {
         >
           {overview.attentionItems.length === 0 ? (
             <div className="empty">
-              <span className="ico">✅</span>모든 임직원이 검진 주기 내에 있습니다.
+              <span className="ico">✅</span>모든 임직원이 검진 주기 안에 있어요.
             </div>
           ) : (
             <div className="table-wrap" style={{ border: 'none' }}>
@@ -114,7 +114,7 @@ export function DashboardPage() {
         >
           {visits.length === 0 ? (
             <div className="empty">
-              <span className="ico">🩺</span>최근 방문 기록이 없습니다.
+              <span className="ico">🩺</span>최근 방문 기록이 없어요.
             </div>
           ) : (
             <ul className="list-reset stack" style={{ gap: 10 }}>
@@ -140,7 +140,7 @@ export function DashboardPage() {
       <div className="grid grid--2">
         <Card title="재고 부족 상비약">
           {lowStock.length === 0 ? (
-            <div className="muted small">부족한 상비약이 없습니다. 👍</div>
+            <div className="muted small">부족한 상비약이 없어요. 👍</div>
           ) : (
             <ul className="list-reset stack" style={{ gap: 8 }}>
               {lowStock.map((m) => (

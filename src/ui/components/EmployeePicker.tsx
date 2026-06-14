@@ -77,7 +77,7 @@ export function EmployeePicker({
             </li>
           )}
           {filtered.length === 0 ? (
-            <li className="combo__empty">검색 결과가 없습니다.</li>
+            <li className="combo__empty">검색 결과가 없어요.</li>
           ) : (
             filtered.slice(0, 50).map((e) => (
               <li key={e.id}>

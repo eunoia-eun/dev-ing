@@ -81,7 +81,7 @@ export function Layout() {
       </main>
 
       <footer className="appfoot">
-        데이터는 이 브라우저(localStorage)에만 저장됩니다 · 개인 건강정보 보호에 유의하세요.
+        모든 데이터는 안전하게 보호되고, 로그인하면 어떤 기기에서든 같은 정보를 볼 수 있어요.
       </footer>
     </div>
   );

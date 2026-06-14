@@ -55,8 +55,8 @@ export class ProgramService {
   /** 모집 중·진행 중인 프로그램의 정보를 수정한다(종료된 프로그램은 수정 불가). */
   async updateProgram(id: Id, input: CreateProgramInput): Promise<HealthProgram> {
     const existing = await this.programs.getById(id);
-    if (!existing) throw new Error('프로그램을 찾을 수 없습니다.');
-    if (!canEditProgram(existing)) throw new Error('종료된 프로그램은 수정할 수 없습니다.');
+    if (!existing) throw new Error('프로그램을 찾을 수 없어요.');
+    if (!canEditProgram(existing)) throw new Error('종료된 프로그램은 수정할 수 없어요.');
     const updated: HealthProgram = { id, ...input };
     await this.programs.save(updated);
     return updated;
@@ -82,13 +82,13 @@ export class ProgramService {
   /** 신청 — 정원이 차 있으면 대기 상태로 등록 */
   async apply(programId: Id, employeeId: EmployeeId): Promise<Enrollment> {
     const program = await this.programs.getById(programId);
-    if (!program) throw new Error('프로그램을 찾을 수 없습니다.');
+    if (!program) throw new Error('프로그램을 찾을 수 없어요.');
 
     const existing = await this.enrollments.listByProgram(programId);
     const already = existing.find(
       (e) => e.employeeId === employeeId && e.status !== 'cancelled',
     );
-    if (already) throw new Error('이미 신청한 프로그램입니다.');
+    if (already) throw new Error('이미 신청한 프로그램이에요.');
 
     const occupied = existing.filter((e) => occupiesSeat(e.status)).length;
     const status = decideEnrollmentStatus(program, occupied);
@@ -128,20 +128,20 @@ export class ProgramService {
 
   async setAttendanceRate(enrollmentId: Id, rate: number): Promise<void> {
     const enrollment = await this.enrollments.getById(enrollmentId);
-    if (!enrollment) throw new Error('신청 내역을 찾을 수 없습니다.');
+    if (!enrollment) throw new Error('신청 내역을 찾을 수 없어요.');
     const clamped = Math.max(0, Math.min(100, Math.round(rate)));
     await this.enrollments.save({ ...enrollment, attendanceRate: clamped });
   }
 
   async markCompleted(enrollmentId: Id): Promise<void> {
     const enrollment = await this.enrollments.getById(enrollmentId);
-    if (!enrollment) throw new Error('신청 내역을 찾을 수 없습니다.');
+    if (!enrollment) throw new Error('신청 내역을 찾을 수 없어요.');
     await this.enrollments.save({ ...enrollment, status: 'completed' });
   }
 
   async getParticipationSummary(programId: Id): Promise<ParticipationSummary> {
     const program = await this.programs.getById(programId);
-    if (!program) throw new Error('프로그램을 찾을 수 없습니다.');
+    if (!program) throw new Error('프로그램을 찾을 수 없어요.');
     const enrollments = await this.enrollments.listByProgram(programId);
     return summarizeParticipation(program, enrollments);
   }

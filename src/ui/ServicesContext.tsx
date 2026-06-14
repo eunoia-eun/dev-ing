@@ -17,6 +17,6 @@ export function ServicesProvider({
 
 export function useServices(): AppServices {
   const ctx = useContext(ServicesContext);
-  if (!ctx) throw new Error('useServices는 ServicesProvider 안에서만 사용할 수 있습니다.');
+  if (!ctx) throw new Error('useServices는 ServicesProvider 안에서만 사용할 수 있어요.');
   return ctx;
 }

@@ -71,7 +71,7 @@ export function EmployeeLayout() {
 // 임직원 페이지 공통: auth에서 employeeId를 꺼내는 훅
 export function useEmployeeId(): string {
   const { session } = useAuth();
-  if (!session?.employeeId) throw new Error('임직원 세션이 없습니다.');
+  if (!session?.employeeId) throw new Error('임직원 세션이 없어요.');
   return session.employeeId;
 }
 

@@ -186,7 +186,7 @@ export class HazardExposureService {
     const department = input.department.trim();
     if (!department) throw new Error('부서를 선택하세요.');
     const found = findSubstance(this.getCatalog(), input.ref);
-    if (!found) throw new Error('카탈로그에서 해당 유해인자를 찾을 수 없습니다.');
+    if (!found) throw new Error('카탈로그에서 해당 유해인자를 찾을 수 없어요.');
 
     const existing = await this.deptHazards.list();
     const dup = existing.some(
@@ -195,7 +195,7 @@ export class HazardExposureService {
         m.categoryCode === input.ref.categoryCode &&
         m.substanceNo === input.ref.substanceNo,
     );
-    if (dup) throw new Error('이미 이 부서에 묶인 유해인자입니다.');
+    if (dup) throw new Error('이미 이 부서에 묶인 유해인자예요.');
 
     const mapping: DepartmentHazard = {
       id: this.ids.next(),
@@ -225,7 +225,7 @@ export class HazardExposureService {
   ): Promise<{ created: number; skipped: number; total: number }> {
     const mappings = await this.deptHazards.list();
     const mapping = mappings.find((m) => m.id === deptHazardId);
-    if (!mapping) throw new Error('부서 유해인자 매핑을 찾을 수 없습니다.');
+    if (!mapping) throw new Error('부서 유해인자 매핑을 찾을 수 없어요.');
 
     const employees = (await this.employees.list()).filter(
       (e) => e.department === mapping.department,
@@ -302,7 +302,7 @@ export class HazardExposureService {
     const catalog = this.getCatalog();
     const found = findSubstance(catalog, input.ref);
     if (!found) {
-      throw new Error('카탈로그에서 해당 유해인자를 찾을 수 없습니다.');
+      throw new Error('카탈로그에서 해당 유해인자를 찾을 수 없어요.');
     }
     // 노출 당시 부서·업무를 스냅샷(생략 시 임직원 현재 값)
     const employee = await this.employees.getById(input.employeeId);
@@ -326,7 +326,7 @@ export class HazardExposureService {
   /** 노출 종료(과거 이력으로 보존) — 업무 변경 등으로 더 이상 노출되지 않을 때 */
   async endExposure(exposureId: string, endDate: ISODate): Promise<ExposureRecord> {
     const record = await this.exposures.getById(exposureId);
-    if (!record) throw new Error('노출 기록을 찾을 수 없습니다.');
+    if (!record) throw new Error('노출 기록을 찾을 수 없어요.');
     const updated: ExposureRecord = { ...record, endDate };
     await this.exposures.save(updated);
     return updated;
@@ -335,7 +335,7 @@ export class HazardExposureService {
   /** 특수건강진단 실시 기록 — 최근 검진일을 갱신해 다음 주기를 다시 계산하게 한다 */
   async recordExam(exposureId: string, examDate: ISODate): Promise<ExposureRecord> {
     const record = await this.exposures.getById(exposureId);
-    if (!record) throw new Error('노출 기록을 찾을 수 없습니다.');
+    if (!record) throw new Error('노출 기록을 찾을 수 없어요.');
     const updated: ExposureRecord = { ...record, lastExamDate: examDate };
     await this.exposures.save(updated);
     return updated;

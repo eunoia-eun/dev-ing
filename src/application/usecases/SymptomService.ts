@@ -133,7 +133,7 @@ export class SymptomService {
     const dispensed: MedicineDispense[] = [];
     for (const [medicineId, quantity] of requested) {
       const medicine = await this.medicines.getById(medicineId);
-      if (!medicine) throw new Error(`상비약을 찾을 수 없습니다: ${medicineId}`);
+      if (!medicine) throw new Error(`상비약을 찾을 수 없어요: ${medicineId}`);
       const next = dispenseFromStock(medicine, quantity); // 부족하면 InsufficientStockError
       updatedMedicines.push(next);
       dispensed.push({
@@ -189,7 +189,7 @@ export class SymptomService {
    */
   async updateVisit(visitId: Id, input: RecordVisitInput): Promise<SymptomVisit> {
     const existing = await this.visits.getById(visitId);
-    if (!existing) throw new Error('방문 기록을 찾을 수 없습니다.');
+    if (!existing) throw new Error('방문 기록을 찾을 수 없어요.');
 
     // 신규/기존 수령 합산
     const newReq = new Map<Id, number>();
@@ -211,7 +211,7 @@ export class SymptomService {
       const delta = want - had;
       const medicine = await this.medicines.getById(medId);
       if (!medicine) {
-        if (want > 0) throw new Error(`상비약을 찾을 수 없습니다: ${medId}`);
+        if (want > 0) throw new Error(`상비약을 찾을 수 없어요: ${medId}`);
         continue;
       }
       if (delta > 0) updatedMedicines.push(dispenseFromStock(medicine, delta)); // 부족 시 예외
@@ -220,7 +220,7 @@ export class SymptomService {
     }
     for (const [medId, quantity] of newReq) {
       const medicine = await this.medicines.getById(medId);
-      if (!medicine) throw new Error(`상비약을 찾을 수 없습니다: ${medId}`);
+      if (!medicine) throw new Error(`상비약을 찾을 수 없어요: ${medId}`);
       dispensed.push({ medicineId: medicine.id, medicineName: medicine.name, quantity, unit: medicine.unit });
     }
 
@@ -267,7 +267,7 @@ export class SymptomService {
   /** 입고(반입) — 재고 증가 + 대장 기록 */
   async restockMedicine(medicineId: Id, quantity: number, reason?: string): Promise<Medicine> {
     const medicine = await this.medicines.getById(medicineId);
-    if (!medicine) throw new Error('상비약을 찾을 수 없습니다.');
+    if (!medicine) throw new Error('상비약을 찾을 수 없어요.');
     const next = restock(medicine, quantity);
     await this.medicines.save(next);
     await this.logMovement({
@@ -310,7 +310,7 @@ export class SymptomService {
   /** 상비약 정보 수정(분류·단위·적정 보유량·재고). 재고가 바뀌면 '재고 조정'으로 대장 기록. */
   async updateMedicine(id: Id, input: MedicineInput): Promise<Medicine> {
     const existing = await this.medicines.getById(id);
-    if (!existing) throw new Error('상비약을 찾을 수 없습니다.');
+    if (!existing) throw new Error('상비약을 찾을 수 없어요.');
     const updated: Medicine = {
       ...existing,
       name: input.name.trim() || existing.name,

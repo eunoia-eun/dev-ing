@@ -48,7 +48,7 @@ export class HealthCheckupService {
 
   async update(id: Id, input: CheckupInput): Promise<HealthCheckup> {
     const existing = await this.checkups.getById(id);
-    if (!existing) throw new Error('검진 기록을 찾을 수 없습니다.');
+    if (!existing) throw new Error('검진 기록을 찾을 수 없어요.');
     const updated: HealthCheckup = { ...existing, ...input };
     await this.checkups.save(updated);
     return updated;

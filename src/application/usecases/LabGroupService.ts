@@ -20,7 +20,7 @@ export class LabGroupService {
     const trimmed = name.trim();
     if (!trimmed) throw new Error('그룹명을 입력하세요.');
     const all = await this.groups.list();
-    if (all.some((g) => g.name === trimmed)) throw new Error('이미 존재하는 그룹입니다.');
+    if (all.some((g) => g.name === trimmed)) throw new Error('이미 존재하는 그룹이에요.');
     const order = all.reduce((m, g) => Math.max(m, g.order), -1) + 1;
     const group: LabGroup = { id: `grp_${this.ids.next()}`, name: trimmed, order };
     await this.groups.save(group);
@@ -32,7 +32,7 @@ export class LabGroupService {
     if (!group) return;
     const used = (await this.items.list()).some((i) => i.group === group.name);
     if (used) {
-      throw new Error('이 그룹에 속한 검사 항목이 있어 삭제할 수 없습니다. 먼저 항목의 그룹을 바꾸거나 삭제하세요.');
+      throw new Error('이 그룹에 속한 검사 항목이 있어 삭제할 수 없어요. 먼저 항목의 그룹을 바꾸거나 삭제하세요.');
     }
     await this.groups.remove(id);
   }

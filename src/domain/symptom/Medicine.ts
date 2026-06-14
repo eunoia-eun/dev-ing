@@ -46,7 +46,7 @@ export function isLowStock(medicine: Medicine): boolean {
  */
 export function dispenseFromStock(medicine: Medicine, quantity: number): Medicine {
   if (quantity <= 0) {
-    throw new Error('수령 수량은 1 이상이어야 합니다.');
+    throw new Error('수령 수량은 1 이상이어야 해요.');
   }
   if (quantity > medicine.stock) {
     throw new InsufficientStockError(medicine, quantity);
@@ -57,7 +57,7 @@ export function dispenseFromStock(medicine: Medicine, quantity: number): Medicin
 /** 입고(재고 보충) */
 export function restock(medicine: Medicine, quantity: number): Medicine {
   if (quantity <= 0) {
-    throw new Error('입고 수량은 1 이상이어야 합니다.');
+    throw new Error('입고 수량은 1 이상이어야 해요.');
   }
   return { ...medicine, stock: medicine.stock + quantity };
 }

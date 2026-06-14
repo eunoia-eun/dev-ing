@@ -49,7 +49,7 @@ export function EmployeeModal({
 
   async function submit() {
     if (!form.name || !form.department || !form.jobTitle || !form.hireDate) {
-      setError('이름·부서·담당업무·입사일은 필수입니다.');
+      setError('이름·부서·담당업무·입사일을 모두 입력해 주세요.');
       return;
     }
     try {

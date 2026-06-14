@@ -21,7 +21,7 @@ export function LoginPage() {
     setError(null);
     const result = await login(employeeNumber.trim(), password, role);
     if (!result.success) {
-      setError(result.reason ?? '로그인에 실패했습니다.');
+      setError(result.reason ?? '로그인에 실패했어요.');
       setBusy(false);
     }
   }
@@ -171,7 +171,7 @@ export function LoginPage() {
           }}
         >
           💡 <strong>임직원</strong> 초기 비밀번호는{' '}
-          <strong style={{ color: '#1d4ed8' }}>생년월일 8자리(YYYYMMDD)</strong>입니다.
+          <strong style={{ color: '#1d4ed8' }}>생년월일 8자리(YYYYMMDD)</strong>예요.
           <br />
           예) 1990년 3월 22일 →{' '}
           <code style={{ background: '#dbeafe', borderRadius: 4, padding: '1px 4px' }}>19900322</code>

@@ -46,7 +46,7 @@ export class EmployeeProfileService {
       this.hazard.getEmployeeAssessments(employeeId),
       this.checkups.listByEmployee(employeeId),
     ]);
-    if (!employee) throw new Error('임직원을 찾을 수 없습니다.');
+    if (!employee) throw new Error('임직원을 찾을 수 없어요.');
 
     return {
       employee,

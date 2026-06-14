@@ -38,7 +38,7 @@ export function EmployeesPage() {
   }
 
   async function deactivate(id: string, name: string) {
-    if (!confirm(`'${name}' 님을 관리 대상에서 제외할까요? (기록은 보존됩니다)`)) return;
+    if (!confirm(`'${name}' 님을 관리 대상에서 제외할까요? (기록은 보존돼요)`)) return;
     await employees.deactivate(id);
     reload();
   }
@@ -67,7 +67,7 @@ export function EmployeesPage() {
           </div>
 
           {deptList.length === 0 ? (
-            <EmptyState icon="🏢">등록된 부서가 없습니다. 부서를 추가하세요.</EmptyState>
+            <EmptyState icon="🏢">등록된 부서가 없어요. 부서를 추가해 보세요.</EmptyState>
           ) : (
             <Card bodyClassName="">
               <ul className="list-reset">
@@ -139,7 +139,7 @@ export function EmployeesPage() {
           >
             {deptEmployees.length === 0 ? (
               <div className="empty">
-                <span className="ico">👥</span>이 부서에 등록된 임직원이 없습니다.
+                <span className="ico">👥</span>이 부서에 등록된 임직원이 없어요.
               </div>
             ) : (
               <div className="table-wrap" style={{ border: 'none' }}>
@@ -277,7 +277,7 @@ function DepartmentModal({
       {error && <ErrorAlert message={error} />}
       {editing && (
         <div className="alert alert--info">
-          부서명을 바꾸면 소속 임직원의 부서도 함께 변경됩니다.
+          부서명을 바꾸면 소속 임직원의 부서도 함께 바뀌어요.
         </div>
       )}
       <div className="field">

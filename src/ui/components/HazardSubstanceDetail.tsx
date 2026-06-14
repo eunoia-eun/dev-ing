@@ -44,8 +44,8 @@ function ExposureLimitCard({ limit }: { limit: KoreanExposureLimit }) {
       </dl>
       <div className="muted small" style={{ marginTop: 10 }}>
         TWA=8시간 시간가중평균 · STEL=15분 단시간노출 · C=최고노출기준(Ceiling). 발암성·변이원성·생식독성
-        등급은 1A·1B·2 (숫자가 작을수록 근거가 강함). 단위(ppm/㎎㎥)는 고시 기준이며 일부 항목은 추정될 수
-        있어 고시 확인을 권장합니다.
+        등급은 1A·1B·2 (숫자가 작을수록 근거가 강함). 단위(ppm/㎎㎥)는 고시 기준이며 일부 항목은 추정값일 수
+        있으니 고시를 함께 확인해 보세요.
       </div>
     </Card>
   );
@@ -120,7 +120,7 @@ export function HazardSubstanceDetail({
         <ErrorAlert message={detail.error} />
       ) : !detail.data ? (
         <Card title="유해인자별 건강장해">
-          <EmptyState icon="📄">이 유해인자에 대한 상세 자료가 없습니다.</EmptyState>
+          <EmptyState icon="📄">이 유해인자의 상세 자료가 아직 없어요.</EmptyState>
         </Card>
       ) : (
         <>
@@ -179,7 +179,7 @@ export function HazardSubstanceDetail({
 
           <div className="muted small">
             출처: 근로자건강진단 실무지침 제3권 「유해인자별 건강장해」 및 화학물질 노출기준(고용노동부,
-            2020) — 산업안전보건연구원. 참고용 요약이며 임상 판단을 대체하지 않습니다.
+            2020) — 산업안전보건연구원. 참고용 요약으로, 임상 판단을 대신할 수는 없어요.
           </div>
         </>
       )}

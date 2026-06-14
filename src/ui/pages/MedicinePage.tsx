@@ -29,7 +29,7 @@ export function MedicinePage() {
   }
 
   async function removeMed(m: Medicine) {
-    if (!confirm(`'${m.name}'을(를) 목록에서 삭제할까요? (입출고 대장 기록은 보존됩니다)`)) return;
+    if (!confirm(`'${m.name}'을(를) 목록에서 삭제할까요? (입출고 대장 기록은 보존돼요)`)) return;
     await symptom.removeMedicine(m.id);
     reloadAll();
   }
@@ -83,7 +83,7 @@ export function MedicinePage() {
           <ErrorAlert message={meds.error} />
         ) : list.length === 0 ? (
           <div className="empty">
-            <span className="ico">💊</span>등록된 상비약이 없습니다. "＋ 약품 등록"으로 추가하세요.
+            <span className="ico">💊</span>등록된 상비약이 없어요. "＋ 약품 등록"으로 추가해 보세요.
           </div>
         ) : (
           <div className="table-wrap" style={{ border: 'none' }}>
@@ -191,7 +191,7 @@ export function MedicinePage() {
           <Spinner />
         ) : filteredMoves.length === 0 ? (
           <div className="empty">
-            <span className="ico">📒</span>해당 조건의 입출고 기록이 없습니다.
+            <span className="ico">📒</span>해당 조건의 입출고 기록이 없어요.
           </div>
         ) : (
           <div className="table-wrap">
@@ -232,7 +232,7 @@ export function MedicinePage() {
           </div>
         )}
         <div className="muted small" style={{ marginTop: 8 }}>
-          ※ 반출은 「증상」 내원일지에서 상비약 수령 시 자동 기록됩니다. 약품을 삭제해도 대장 기록은 보존됩니다.
+          ※ 반출은 「상담일지」에서 상비약 수령 시 자동으로 기록돼요. 약품을 삭제해도 대장 기록은 남아요.
         </div>
       </Card>
 
@@ -307,7 +307,7 @@ function RestockModal({
       {error && <ErrorAlert message={error} />}
       <div className="alert alert--info">
         현재 재고 {medicine.stock}
-        {medicine.unit} · 입고 일시는 저장 시각으로 자동 기록됩니다.
+        {medicine.unit} · 입고 일시는 저장 시각으로 자동으로 기록돼요.
       </div>
       <div className="form-row">
         <div className="field">
@@ -415,7 +415,7 @@ function MedicineModal({
         </div>
       </div>
       {editing && (
-        <div className="muted small">※ 재고를 직접 수정하면 입출고 대장에 '재고 조정'으로 기록됩니다.</div>
+        <div className="muted small">※ 재고를 직접 수정하면 입출고 대장에 '재고 조정'으로 기록돼요.</div>
       )}
     </Modal>
   );

@@ -47,10 +47,10 @@ export class AuthService {
   ): Promise<LoginResult & { employee?: null }> {
     const account = await this.accounts.findManagerAccount();
     if (!account || account.employeeNumber !== employeeNumber) {
-      return { success: false, reason: '사번 또는 비밀번호가 올바르지 않습니다.' };
+      return { success: false, reason: '사번 또는 비밀번호가 올바르지 않아요.' };
     }
     const ok = await this.hasher.verify(password, account.hashedPassword);
-    if (!ok) return { success: false, reason: '사번 또는 비밀번호가 올바르지 않습니다.' };
+    if (!ok) return { success: false, reason: '사번 또는 비밀번호가 올바르지 않아요.' };
     return { success: true, account, employee: null };
   }
 
@@ -61,7 +61,7 @@ export class AuthService {
     const all = await this.employees.list();
     const employee = all.find((e) => e.employeeNumber === employeeNumber && e.active);
     if (!employee) {
-      return { success: false, reason: '등록된 임직원 사번을 찾을 수 없습니다.' };
+      return { success: false, reason: '등록된 임직원 사번을 찾을 수 없어요.' };
     }
 
     const account = await this.accounts.findByEmployeeId(employee.id);
@@ -70,10 +70,10 @@ export class AuthService {
       // 첫 로그인: 생년월일(YYYYMMDD)을 초기 비밀번호로 사용
       const defaultPw = employee.birthDate?.replace(/-/g, '') ?? '';
       if (!defaultPw) {
-        return { success: false, reason: '생년월일 정보가 없어 초기 비밀번호를 설정할 수 없습니다. 보건관리자에게 문의하세요.' };
+        return { success: false, reason: '생년월일 정보가 없어 초기 비밀번호를 설정할 수 없어요. 보건관리자에게 문의하세요.' };
       }
       if (password !== defaultPw) {
-        return { success: false, reason: '비밀번호가 올바르지 않습니다. (초기 비밀번호: 생년월일 8자리 YYYYMMDD)' };
+        return { success: false, reason: '비밀번호가 올바르지 않아요. (초기 비밀번호: 생년월일 8자리 YYYYMMDD)' };
       }
       const newAccount: Account = {
         id: this.ids.next(),
@@ -87,7 +87,7 @@ export class AuthService {
     }
 
     const ok = await this.hasher.verify(password, account.hashedPassword);
-    if (!ok) return { success: false, reason: '비밀번호가 올바르지 않습니다.' };
+    if (!ok) return { success: false, reason: '비밀번호가 올바르지 않아요.' };
     return { success: true, account, employee };
   }
 
@@ -97,10 +97,10 @@ export class AuthService {
     newPassword: string,
   ): Promise<void> {
     const account = await this.accounts.list().then((all) => all.find((a) => a.id === accountId));
-    if (!account) throw new Error('계정을 찾을 수 없습니다.');
+    if (!account) throw new Error('계정을 찾을 수 없어요.');
     const ok = await this.hasher.verify(currentPassword, account.hashedPassword);
-    if (!ok) throw new Error('현재 비밀번호가 올바르지 않습니다.');
-    if (newPassword.length < 6) throw new Error('비밀번호는 6자 이상이어야 합니다.');
+    if (!ok) throw new Error('현재 비밀번호가 올바르지 않아요.');
+    if (newPassword.length < 6) throw new Error('비밀번호는 6자 이상으로 입력해 주세요.');
     await this.accounts.save({ ...account, hashedPassword: await this.hasher.hash(newPassword) });
   }
 
@@ -108,9 +108,9 @@ export class AuthService {
   async resetEmployeePassword(employeeId: string): Promise<void> {
     const all = await this.employees.list();
     const employee = all.find((e) => e.id === employeeId);
-    if (!employee) throw new Error('임직원을 찾을 수 없습니다.');
+    if (!employee) throw new Error('임직원을 찾을 수 없어요.');
     const defaultPw = employee.birthDate?.replace(/-/g, '') ?? '';
-    if (!defaultPw) throw new Error('생년월일 정보가 없어 초기화할 수 없습니다.');
+    if (!defaultPw) throw new Error('생년월일 정보가 없어 초기화할 수 없어요.');
 
     const account = await this.accounts.findByEmployeeId(employeeId);
     if (account) {
@@ -126,9 +126,9 @@ export class AuthService {
   async updateManagerNumber(accountId: string, newNumber: string): Promise<void> {
     const all = await this.accounts.list();
     const account = all.find((a) => a.id === accountId && a.role === 'manager');
-    if (!account) throw new Error('관리자 계정을 찾을 수 없습니다.');
+    if (!account) throw new Error('관리자 계정을 찾을 수 없어요.');
     const dup = all.find((a) => a.employeeNumber === newNumber && a.id !== accountId);
-    if (dup) throw new Error('이미 사용 중인 사번입니다.');
+    if (dup) throw new Error('이미 사용 중인 사번이에요.');
     await this.accounts.save({ ...account, employeeNumber: newNumber });
   }
 }
