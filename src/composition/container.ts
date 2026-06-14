@@ -10,11 +10,14 @@ import { LabItemService } from '@application/usecases/LabItemService';
 import { LabGroupService } from '@application/usecases/LabGroupService';
 import { CheckupTypeService } from '@application/usecases/CheckupTypeService';
 import { StatisticsService } from '@application/usecases/StatisticsService';
+import { AuthService } from '@application/usecases/AuthService';
 
 import { StaticHazardCatalogProvider } from '@infrastructure/seed/hazardCatalog';
 import { StaticHazardHealthProvider } from '@infrastructure/seed/hazardHealthDetails';
 import { SystemClock } from '@infrastructure/system/SystemClock';
 import { UuidIdGenerator } from '@infrastructure/system/UuidIdGenerator';
+import { WebCryptoHasher } from '@infrastructure/system/WebCryptoHasher';
+import { LocalStorageAccountRepository } from '@infrastructure/repositories/LocalStorageAccountRepository';
 import {
   LocalAssignmentRepository,
   LocalDepartmentRepository,
@@ -37,6 +40,7 @@ import {
  * UI는 이 인터페이스에만 의존하고, 어떤 저장소/시계를 쓰는지는 모른다.
  */
 export interface AppServices {
+  auth: AuthService;
   employees: EmployeeService;
   hazard: HazardExposureService;
   symptom: SymptomService;
@@ -75,6 +79,8 @@ export function createAppServices(): AppServices {
   const checkupTypeRepo = new LocalCheckupTypeRepository();
   const catalogProvider = new StaticHazardCatalogProvider();
   const healthProvider = new StaticHazardHealthProvider();
+  const accountRepo = new LocalStorageAccountRepository();
+  const hasher = new WebCryptoHasher();
 
   const employees = new EmployeeService(employeeRepo, ids);
   const symptom = new SymptomService(visitRepo, medicineRepo, movementRepo, clock, ids);
@@ -90,6 +96,7 @@ export function createAppServices(): AppServices {
   const checkup = new HealthCheckupService(checkupRepo, ids);
 
   return {
+    auth: new AuthService(accountRepo, employeeRepo, hasher, ids),
     employees,
     hazard,
     symptom,

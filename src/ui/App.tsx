@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { AuthProvider, useAuth } from './AuthContext';
 import { Layout } from './components/Layout';
 import { DashboardPage } from './pages/DashboardPage';
 import { CatalogPage } from './pages/CatalogPage';
@@ -8,34 +9,79 @@ import { ProgramPage } from './pages/ProgramPage';
 import { StatisticsPage } from './pages/StatisticsPage';
 import { EmployeesPage } from './pages/EmployeesPage';
 import { EmployeeProfilePage } from './pages/EmployeeProfilePage';
+import { EmployeeLayout } from './pages/employee/EmployeeLayout';
+import { EmployeeHomePage } from './pages/employee/EmployeeHomePage';
+import { EmployeeHazardPage } from './pages/employee/EmployeeHazardPage';
+import { EmployeeHealthPage } from './pages/employee/EmployeeHealthPage';
+import { EmployeeProgramPage } from './pages/employee/EmployeeProgramPage';
+import { LoginPage } from './pages/LoginPage';
+import { AccountSettingsPage } from './pages/AccountSettingsPage';
 
-/** 구 /profile/:id → /employees/:id 리다이렉트 */
 function ProfileRedirect() {
   const { id } = useParams();
   return <Navigate to={id ? `/employees/${id}` : '/employees'} replace />;
 }
 
-export function App() {
+function AppRoutes() {
+  const { session, ready } = useAuth();
+
+  if (!ready) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
+        <div style={{ color: '#2563eb', fontWeight: 700 }}>로딩 중...</div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <Routes>
+        <Route path="*" element={<LoginPage />} />
+      </Routes>
+    );
+  }
+
+  if (session.role === 'employee') {
+    return (
+      <Routes>
+        <Route element={<EmployeeLayout />}>
+          <Route index element={<EmployeeHomePage />} />
+          <Route path="hazards" element={<EmployeeHazardPage />} />
+          <Route path="health" element={<EmployeeHealthPage />} />
+          <Route path="programs" element={<EmployeeProgramPage />} />
+          <Route path="settings" element={<AccountSettingsPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Route>
+      </Routes>
+    );
+  }
+
+  // 보건관리자 모드
   return (
     <Routes>
+      <Route path="settings" element={<AccountSettingsPage />} />
       <Route element={<Layout />}>
         <Route index element={<DashboardPage />} />
-        {/* 유해물질 노출 메뉴는 건강 프로필로 통합됨 */}
         <Route path="hazard" element={<Navigate to="/profile" replace />} />
         <Route path="catalog" element={<CatalogPage />} />
         <Route path="symptom" element={<SymptomPage />} />
         <Route path="medicine" element={<MedicinePage />} />
         <Route path="program" element={<ProgramPage />} />
         <Route path="stats" element={<StatisticsPage />} />
-        {/* 건강 동영상 메뉴 제거됨 */}
-        {/* 명부 + 건강 프로필 통합: 목록은 /employees, 개인 프로필은 /employees/:id */}
         <Route path="employees" element={<EmployeesPage />} />
         <Route path="employees/:id" element={<EmployeeProfilePage />} />
-        {/* 기존 경로 호환 */}
         <Route path="profile" element={<Navigate to="/employees" replace />} />
         <Route path="profile/:id" element={<ProfileRedirect />} />
         <Route path="*" element={<DashboardPage />} />
       </Route>
     </Routes>
+  );
+}
+
+export function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }

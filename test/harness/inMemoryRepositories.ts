@@ -8,6 +8,7 @@ import type { CheckupTypeItem, HealthCheckup, LabGroup, LabItem } from '@domain/
 import type { Department } from '@domain/department/Department';
 import type { DepartmentHazard } from '@domain/hazard/DepartmentHazard';
 import type { InventoryMovement } from '@domain/inventory/InventoryMovement';
+import type { Account } from '@domain/auth/Account';
 import type { Id } from '@domain/shared/types';
 
 import type { EmployeeRepository } from '@application/ports/EmployeeRepository';
@@ -22,6 +23,7 @@ import type { ExposureRepository } from '@application/ports/HazardRepository';
 import type { MedicineRepository, SymptomVisitRepository } from '@application/ports/SymptomRepository';
 import type { EnrollmentRepository, ProgramRepository } from '@application/ports/ProgramRepository';
 import type { HealthCheckupRepository } from '@application/ports/HealthCheckupRepository';
+import type { IAccountRepository } from '@application/ports/IAccountRepository';
 
 /** 인메모리 컬렉션 — 빠르고 결정적인 테스트용. localStorage를 거치지 않는다. */
 class InMemoryStore<T extends { id: string }> {
@@ -345,5 +347,28 @@ export class InMemoryHealthCheckupRepository implements HealthCheckupRepository 
   remove(id: Id) {
     this.store.remove(id);
     return Promise.resolve();
+  }
+}
+
+export class InMemoryAccountRepository implements IAccountRepository {
+  private store: InMemoryStore<Account>;
+  constructor(seed: Account[] = []) {
+    this.store = new InMemoryStore(seed);
+  }
+  findByEmployeeId(id: string) {
+    return Promise.resolve(this.store.all().find((a) => a.employeeId === id) ?? null);
+  }
+  findByEmployeeNumber(num: string) {
+    return Promise.resolve(this.store.all().find((a) => a.employeeNumber === num) ?? null);
+  }
+  findManagerAccount() {
+    return Promise.resolve(this.store.all().find((a) => a.role === 'manager') ?? null);
+  }
+  save(a: Account) {
+    this.store.upsert(a);
+    return Promise.resolve();
+  }
+  list() {
+    return Promise.resolve(this.store.all());
   }
 }

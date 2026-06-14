@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 
 interface NavItem {
   to: string;
@@ -21,6 +22,8 @@ const NAV: NavItem[] = [
 
 export function Layout() {
   const loc = useLocation();
+  const navigate = useNavigate();
+  const { session, logout } = useAuth();
   const active =
     NAV.find((n) => (n.end ? loc.pathname === n.to : loc.pathname.startsWith(n.to))) ?? NAV[0];
 
@@ -31,21 +34,40 @@ export function Layout() {
           <span className="logo">⚕</span>
           <span>사업장 건강관리</span>
         </div>
-        <nav className="topnav__menu">
-          {NAV.map((n) => (
-            <NavLink
-              key={n.to}
-              to={n.to}
-              end={n.end}
-              className={({ isActive }) => `topnav-link${isActive ? ' active' : ''}`}
-            >
-              <span className="ico">{n.icon}</span>
-              <span>{n.label}</span>
-            </NavLink>
-          ))}
-        </nav>
-        <span className="badge badge--info topnav__mode">보건관리자 모드</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 600 }}>
+            ⚕ {session?.employeeNumber}
+          </span>
+          <button
+            className="btn btn--sm btn--ghost"
+            style={{ color: '#6b7280', fontSize: 12 }}
+            onClick={() => navigate('/settings')}
+          >
+            계정 설정
+          </button>
+          <button
+            className="btn btn--sm btn--ghost"
+            style={{ color: '#ef4444', fontSize: 12 }}
+            onClick={logout}
+          >
+            로그아웃
+          </button>
+        </div>
       </header>
+
+      <nav className="mainmenu">
+        {NAV.map((n) => (
+          <NavLink
+            key={n.to}
+            to={n.to}
+            end={n.end}
+            className={({ isActive }) => `topnav-link${isActive ? ' active' : ''}`}
+          >
+            <span className="ico">{n.icon}</span>
+            <span>{n.label}</span>
+          </NavLink>
+        ))}
+      </nav>
 
       <header className="topbar">
         <div>

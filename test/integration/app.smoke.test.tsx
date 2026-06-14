@@ -1,15 +1,41 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { App } from '@ui/App';
 import { ServicesProvider } from '@ui/ServicesContext';
+import type { AuthSession } from '@ui/AuthContext';
 
 /**
  * 앱 전체 스모크 테스트.
  * 실제 합성 루트(createAppServices) + localStorage(jsdom) + 시드 데이터로
  * 라우팅·컨텍스트·서비스 배선이 한 번에 동작하는지 확인한다.
  */
+
+/** 테스트마다 관리자 세션을 localStorage에 미리 주입 */
+function seedManagerSession() {
+  const session: AuthSession = {
+    accountId: 'test-acc',
+    role: 'manager',
+    employeeId: null,
+    employeeName: null,
+    employeeNumber: 'admin',
+  };
+  localStorage.setItem('whm:session', JSON.stringify(session));
+}
+
+/** 테스트마다 임직원(emp-1) 세션을 localStorage에 미리 주입 */
+function seedEmployeeSession() {
+  const session: AuthSession = {
+    accountId: 'test-acc-emp',
+    role: 'employee',
+    employeeId: 'emp-1',
+    employeeName: '김철수',
+    employeeNumber: '2018-0101',
+  };
+  localStorage.setItem('whm:session', JSON.stringify(session));
+}
+
 function renderApp(initialPath = '/') {
   return render(
     <MemoryRouter initialEntries={[initialPath]}>
@@ -21,6 +47,10 @@ function renderApp(initialPath = '/') {
 }
 
 describe('App 스모크', () => {
+  beforeEach(() => {
+    seedManagerSession();
+  });
+
   it('대시보드가 시드 데이터 요약과 함께 렌더된다', async () => {
     renderApp('/');
     // 상단 타이틀
@@ -78,5 +108,28 @@ describe('App 스모크', () => {
     // 검사 수치 추이 매트릭스(검사항목 행)
     expect(await screen.findByText('검사 수치 추이')).toBeInTheDocument();
     expect(await screen.findByText('공복혈당')).toBeInTheDocument();
+  });
+});
+
+describe('App 스모크 (임직원)', () => {
+  beforeEach(() => {
+    seedEmployeeSession();
+  });
+
+  it('내 유해인자에서 진행 중 노출을 클릭하면 카탈로그 상세(노출기준 등)로 연결되고, 되돌아갈 수 있다', async () => {
+    renderApp('/hazards');
+
+    expect(await screen.findByText('진행 중 노출 (2종)')).toBeInTheDocument();
+    await userEvent.click(await screen.findByText('톨루엔'));
+
+    // 카탈로그 상세(HazardSubstanceDetail) — 영문명/CAS, 분류 뱃지, 노출기준
+    expect(await screen.findByText(/Toluene/)).toBeInTheDocument();
+    expect(await screen.findByText(/CAS 108-88-3/)).toBeInTheDocument();
+    expect(await screen.findByText('[화학적 인자] 유기화합물')).toBeInTheDocument();
+    expect(await screen.findByText('50 ppm')).toBeInTheDocument();
+
+    // 뒤로가기 → 다시 진행 중 노출 목록
+    await userEvent.click(await screen.findByText('← 내 유해인자'));
+    expect(await screen.findByText('진행 중 노출 (2종)')).toBeInTheDocument();
   });
 });

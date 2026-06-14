@@ -1,16 +1,30 @@
 import type { EmployeeId } from '@domain/employee/Employee';
 import {
+  canEditProgram,
   decideEnrollmentStatus,
+  isProgramInRange,
   occupiesSeat,
   summarizeParticipation,
+  type DateRange,
   type Enrollment,
   type HealthProgram,
   type ParticipationSummary,
+  type ProgramStatus,
 } from '@domain/program/HealthProgram';
-import type { Id } from '@domain/shared/types';
+import type { Id, ISODate } from '@domain/shared/types';
 import { compareDates } from '@domain/shared/date';
 import type { EnrollmentRepository, ProgramRepository } from '../ports/ProgramRepository';
 import type { Clock, IdGenerator } from '../ports/system';
+
+export interface CreateProgramInput {
+  title: string;
+  description: string;
+  category: string;
+  capacity: number;
+  startDate: ISODate;
+  endDate: ISODate;
+  status: ProgramStatus;
+}
 
 /**
  * 메뉴 3. 건강프로그램 신청 및 참여 현황.
@@ -30,6 +44,31 @@ export class ProgramService {
 
   getProgram(id: Id): Promise<HealthProgram | null> {
     return this.programs.getById(id);
+  }
+
+  async createProgram(input: CreateProgramInput): Promise<HealthProgram> {
+    const program: HealthProgram = { id: this.ids.next(), ...input };
+    await this.programs.save(program);
+    return program;
+  }
+
+  /** 모집 중·진행 중인 프로그램의 정보를 수정한다(종료된 프로그램은 수정 불가). */
+  async updateProgram(id: Id, input: CreateProgramInput): Promise<HealthProgram> {
+    const existing = await this.programs.getById(id);
+    if (!existing) throw new Error('프로그램을 찾을 수 없습니다.');
+    if (!canEditProgram(existing)) throw new Error('종료된 프로그램은 수정할 수 없습니다.');
+    const updated: HealthProgram = { id, ...input };
+    await this.programs.save(updated);
+    return updated;
+  }
+
+  /** 프로그램 삭제 — 신청/참여 기록도 함께 삭제한다. */
+  async removeProgram(id: Id): Promise<void> {
+    const enrollments = await this.enrollments.listByProgram(id);
+    for (const e of enrollments) {
+      await this.enrollments.remove(e.id);
+    }
+    await this.programs.remove(id);
   }
 
   listEnrollmentsByProgram(programId: Id): Promise<Enrollment[]> {
@@ -107,10 +146,12 @@ export class ProgramService {
     return summarizeParticipation(program, enrollments);
   }
 
-  async getAllSummaries(): Promise<Array<{ program: HealthProgram; summary: ParticipationSummary }>> {
+  /** range를 주면 운영기간이 그 기간과 겹치는 프로그램만 반환(기본: 전체). */
+  async getAllSummaries(range?: DateRange): Promise<Array<{ program: HealthProgram; summary: ParticipationSummary }>> {
     const programs = await this.programs.list();
     const all = await this.enrollments.list();
-    return programs.map((program) => ({
+    const filtered = range ? programs.filter((p) => isProgramInRange(p, range)) : programs;
+    return filtered.map((program) => ({
       program,
       summary: summarizeParticipation(
         program,

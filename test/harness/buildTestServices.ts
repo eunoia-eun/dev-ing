@@ -22,12 +22,15 @@ import { LabItemService } from '@application/usecases/LabItemService';
 import { LabGroupService } from '@application/usecases/LabGroupService';
 import { CheckupTypeService } from '@application/usecases/CheckupTypeService';
 import { StatisticsService } from '@application/usecases/StatisticsService';
+import { AuthService } from '@application/usecases/AuthService';
+import type { IPasswordHasher } from '@application/ports/IPasswordHasher';
 import type { AppServices } from '@composition/container';
 import { StaticHazardCatalogProvider } from '@infrastructure/seed/hazardCatalog';
 import { StaticHazardHealthProvider } from '@infrastructure/seed/hazardHealthDetails';
 
 import { FixedClock, SeqIdGenerator } from './fakes';
 import {
+  InMemoryAccountRepository,
   InMemoryAssignmentRepository,
   InMemoryDepartmentRepository,
   InMemoryDepartmentHazardRepository,
@@ -43,6 +46,16 @@ import {
   InMemorySymptomVisitRepository,
   InMemoryInventoryMovementRepository,
 } from './inMemoryRepositories';
+
+/** 테스트용 평문 해셔 — crypto.subtle 없이 동작 */
+class PlainTextHasher implements IPasswordHasher {
+  async hash(pw: string) {
+    return `plain:${pw}`;
+  }
+  async verify(pw: string, hashed: string) {
+    return hashed === `plain:${pw}`;
+  }
+}
 
 export interface SeedInput {
   employees?: Employee[];
@@ -130,6 +143,7 @@ export function buildTestServices(
   const checkupService = new HealthCheckupService(repos.checkups, ids);
 
   const services: AppServices = {
+    auth: new AuthService(new InMemoryAccountRepository(), repos.employees, new PlainTextHasher(), ids),
     employees: employeeService,
     hazard: hazardService,
     symptom: symptomService,

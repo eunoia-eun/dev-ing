@@ -1,4 +1,5 @@
 import type { EmployeeId } from '../employee/Employee';
+import { compareDates } from '../shared/date';
 import type { Id, ISODate } from '../shared/types';
 
 export type ProgramStatus =
@@ -55,6 +56,11 @@ export interface Enrollment {
 /** 정원을 차지하는(=확정/신청/수료) 상태인지 */
 export function occupiesSeat(status: EnrollmentStatus): boolean {
   return status === 'applied' || status === 'enrolled' || status === 'completed';
+}
+
+/** 모집 중·진행 중인 프로그램만 정보 수정이 가능하다(종료된 프로그램은 수정 불가). */
+export function canEditProgram(program: HealthProgram): boolean {
+  return program.status !== 'closed';
 }
 
 /**
@@ -125,4 +131,19 @@ export function summarizeParticipation(
     fillRate,
     averageAttendanceRate,
   };
+}
+
+export interface DateRange {
+  start: ISODate;
+  end: ISODate;
+}
+
+/** 올해 1/1~12/31 기본 조회기간. nowYear는 가장자리에서 주입. */
+export function defaultProgramRange(nowYear: number): DateRange {
+  return { start: `${nowYear}-01-01`, end: `${nowYear}-12-31` };
+}
+
+/** 프로그램 운영기간(startDate~endDate)이 조회기간과 겹치는지(순수 함수) */
+export function isProgramInRange(program: HealthProgram, range: DateRange): boolean {
+  return compareDates(program.startDate, range.end) <= 0 && compareDates(program.endDate, range.start) >= 0;
 }

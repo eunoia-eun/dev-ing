@@ -31,11 +31,12 @@ import { useAsync } from '../hooks/useAsync';
 import { Card, EmptyState, ErrorAlert, Modal, Spinner } from '../components/ui';
 import { ExposureStatusBadge } from '../components/StatusBadge';
 import { EmployeePicker } from '../components/EmployeePicker';
+import { EmployeeModal } from '../components/EmployeeModal';
 import { LineChart, type LinePoint } from '../components/LineChart';
 import { describeDaysUntil, formatDate, formatDateTime } from '../format';
 
 export function EmployeeProfilePage() {
-  const { profile, employees, labItems, checkupTypes, assignments } = useServices();
+  const { profile, employees, labItems, checkupTypes, assignments, departments } = useServices();
   const { id } = useParams();
   const navigate = useNavigate();
   const selectedId = id ?? '';
@@ -43,6 +44,7 @@ export function EmployeeProfilePage() {
   const emp = useAsync(() => employees.list(), []);
   const cat = useAsync(() => labItems.list(), []); // 검사 항목 카탈로그(전체)
   const types = useAsync(() => checkupTypes.list(), []); // 검진 종류 카탈로그
+  const deptList = useAsync(() => departments.list(), []); // 부서 목록(인적사항 수정용)
   const prof = useAsync(
     () => (selectedId ? profile.getProfile(selectedId) : Promise.resolve(null)),
     [selectedId],
@@ -85,11 +87,13 @@ export function EmployeeProfilePage() {
           assignments={assign.data ?? []}
           labItems={cat.data ?? []}
           checkupTypes={types.data ?? []}
+          departments={(deptList.data ?? []).map((d) => d.name)}
           onAddCheckup={() => setModal({ open: true, editing: null })}
           onEditCheckup={(c) => setModal({ open: true, editing: c })}
           onReload={() => {
             prof.reload();
             assign.reload();
+            emp.reload();
           }}
         />
       ) : null}
@@ -118,6 +122,7 @@ function ProfileView({
   assignments,
   labItems,
   checkupTypes,
+  departments,
   onAddCheckup,
   onEditCheckup,
   onReload,
@@ -126,6 +131,7 @@ function ProfileView({
   assignments: Assignment[];
   labItems: LabItem[];
   checkupTypes: CheckupTypeItem[];
+  departments: string[];
   onAddCheckup: () => void;
   onEditCheckup: (c: HealthCheckup) => void;
   onReload: () => void;
@@ -135,10 +141,10 @@ function ProfileView({
   // exposureAdd: null=닫힘, 문자열=새 노출의 기본 시작일(배치 시작일/오늘)
   const [exposureAdd, setExposureAdd] = useState<string | null>(null);
   const [assignChange, setAssignChange] = useState(false);
-  // 배치 묶음 펼침/접힘 — 기본: 현재 배치 펼침, 과거 접힘. 사용자가 누른 항목만 기억(반전).
+  const [editPersonal, setEditPersonal] = useState(false);
+  // 배치 묶음 펼침/접힘 — 기본: 모두 펼침(부서·노출 변경 이력을 한눈에 확인). 사용자가 누른 항목만 접음.
   const [toggledAssign, setToggledAssign] = useState<Set<string>>(new Set());
-  const isAssignExpanded = (a: Assignment) =>
-    toggledAssign.has(a.id) ? !isCurrentAssignment(a) : isCurrentAssignment(a);
+  const isAssignExpanded = (a: Assignment) => !toggledAssign.has(a.id);
   const toggleAssign = (id: string) =>
     setToggledAssign((prev) => {
       const next = new Set(prev);
@@ -325,18 +331,24 @@ function ProfileView({
             </div>
             <div className="small" style={{ marginTop: 6 }}>
               담당 업무: <strong>{e.jobTitle}</strong> · 입사일 {formatDate(e.hireDate)}
+              {e.birthDate ? ` · ${formatDate(e.birthDate)}` : ''}
               {e.gender ? ` · ${e.gender === 'M' ? '남' : '여'}` : ''}
               {e.phone ? ` · ${e.phone}` : ''}
             </div>
           </div>
-          {latestCheckup && (
-            <div style={{ textAlign: 'right' }}>
-              <div className="muted small">최근 판정 ({formatDate(latestCheckup.examDate)})</div>
-              <span className={`badge badge--${gradeTone(latestCheckup.grade)}`} style={{ fontSize: 13 }}>
-                {HEALTH_GRADE_LABEL[latestCheckup.grade]}
-              </span>
-            </div>
-          )}
+          <div className="row" style={{ gap: 12, alignItems: 'flex-start' }}>
+            {latestCheckup && (
+              <div style={{ textAlign: 'right' }}>
+                <div className="muted small">최근 판정 ({formatDate(latestCheckup.examDate)})</div>
+                <span className={`badge badge--${gradeTone(latestCheckup.grade)}`} style={{ fontSize: 13 }}>
+                  {HEALTH_GRADE_LABEL[latestCheckup.grade]}
+                </span>
+              </div>
+            )}
+            <button className="btn btn--sm" onClick={() => setEditPersonal(true)}>
+              인적사항 수정
+            </button>
+          </div>
         </div>
       </Card>
 
@@ -584,6 +596,19 @@ function ProfileView({
           onClose={() => setAssignChange(false)}
           onDone={() => {
             setAssignChange(false);
+            onReload();
+          }}
+        />
+      )}
+
+      {editPersonal && (
+        <EmployeeModal
+          departments={departments}
+          defaultDept={e.department}
+          editing={e}
+          onClose={() => setEditPersonal(false)}
+          onSaved={() => {
+            setEditPersonal(false);
             onReload();
           }}
         />

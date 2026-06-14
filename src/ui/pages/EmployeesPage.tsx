@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { Gender } from '@domain/employee/Employee';
+import type { Employee } from '@domain/employee/Employee';
 import type { Department } from '@domain/department/Department';
 import { useServices } from '../ServicesContext';
 import { useAsync } from '../hooks/useAsync';
 import { Card, EmptyState, ErrorAlert, Modal, Spinner } from '../components/ui';
+import { EmployeeModal } from '../components/EmployeeModal';
 import { formatDate } from '../format';
 
 export function EmployeesPage() {
@@ -18,6 +19,7 @@ export function EmployeesPage() {
     editing: null,
   });
   const [empModalDept, setEmpModalDept] = useState<string | null>(null); // 임직원 추가 모달(소속 부서)
+  const [editingEmp, setEditingEmp] = useState<Employee | null>(null); // 수정 모달
 
   function reload() {
     depts.reload();
@@ -146,6 +148,8 @@ export function EmployeesPage() {
                     <tr>
                       <th>사번</th>
                       <th>이름</th>
+                      <th>성별</th>
+                      <th>생년월일</th>
                       <th>직급</th>
                       <th>담당 업무</th>
                       <th>입사일</th>
@@ -161,6 +165,8 @@ export function EmployeesPage() {
                             <strong>{e.name}</strong>
                           </Link>
                         </td>
+                        <td>{e.gender === 'M' ? '남' : e.gender === 'F' ? '여' : '-'}</td>
+                        <td>{e.birthDate ? formatDate(e.birthDate) : '-'}</td>
                         <td>{e.position ?? '-'}</td>
                         <td>{e.jobTitle}</td>
                         <td>{formatDate(e.hireDate)}</td>
@@ -169,6 +175,9 @@ export function EmployeesPage() {
                             <Link className="btn btn--sm" to={`/employees/${e.id}`}>
                               건강 프로필
                             </Link>
+                            <button className="btn btn--sm" onClick={() => setEditingEmp(e)}>
+                              수정
+                            </button>
                             <button className="btn btn--danger btn--sm" onClick={() => deactivate(e.id, e.name)}>
                               제외
                             </button>
@@ -204,6 +213,19 @@ export function EmployeesPage() {
           onClose={() => setEmpModalDept(null)}
           onSaved={() => {
             setEmpModalDept(null);
+            reload();
+          }}
+        />
+      )}
+
+      {editingEmp && (
+        <EmployeeModal
+          departments={deptList.map((d) => d.department.name)}
+          defaultDept={editingEmp.department}
+          editing={editingEmp}
+          onClose={() => setEditingEmp(null)}
+          onSaved={() => {
+            setEditingEmp(null);
             reload();
           }}
         />
@@ -265,157 +287,6 @@ function DepartmentModal({
       <div className="field">
         <label>비고</label>
         <input className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="예: 도장·조립 공정" />
-      </div>
-    </Modal>
-  );
-}
-
-interface EmpForm {
-  employeeNumber: string;
-  name: string;
-  department: string;
-  position: string;
-  jobTitle: string;
-  hireDate: string;
-  birthDate: string;
-  gender: '' | Gender;
-  phone: string;
-  /** 'domestic' = 내국인(기본) | 'foreign' = 외국인 */
-  nationality: 'domestic' | 'foreign';
-}
-
-function EmployeeModal({
-  departments,
-  defaultDept,
-  onClose,
-  onSaved,
-}: {
-  departments: string[];
-  defaultDept: string;
-  onClose: () => void;
-  onSaved: () => void;
-}) {
-  const { employees } = useServices();
-  const [form, setForm] = useState<EmpForm>({
-    employeeNumber: '',
-    name: '',
-    department: defaultDept || departments[0] || '',
-    position: '',
-    jobTitle: '',
-    hireDate: '',
-    birthDate: '',
-    gender: '',
-    phone: '',
-    nationality: 'domestic',
-  });
-  const [error, setError] = useState<string | null>(null);
-  const set = <K extends keyof EmpForm>(k: K, v: EmpForm[K]) => setForm((f) => ({ ...f, [k]: v }));
-
-  async function submit() {
-    if (!form.name || !form.department || !form.jobTitle || !form.hireDate) {
-      setError('이름·부서·담당업무·입사일은 필수입니다.');
-      return;
-    }
-    try {
-      await employees.create({
-        employeeNumber: form.employeeNumber || '-',
-        name: form.name,
-        department: form.department,
-        position: form.position || undefined,
-        jobTitle: form.jobTitle,
-        hireDate: form.hireDate,
-        birthDate: form.birthDate || undefined,
-        gender: form.gender || undefined,
-        phone: form.phone || undefined,
-        isForeign: form.nationality === 'foreign',
-      });
-      onSaved();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    }
-  }
-
-  return (
-    <Modal
-      title="임직원 추가"
-      onClose={onClose}
-      footer={
-        <>
-          <button className="btn" onClick={onClose}>
-            취소
-          </button>
-          <button className="btn btn--primary" onClick={submit}>
-            저장
-          </button>
-        </>
-      }
-    >
-      {error && <ErrorAlert message={error} />}
-      <div className="form-row">
-        <div className="field">
-          <label>사번</label>
-          <input className="input" value={form.employeeNumber} onChange={(e) => set('employeeNumber', e.target.value)} />
-        </div>
-        <div className="field">
-          <label>이름 *</label>
-          <input className="input" value={form.name} onChange={(e) => set('name', e.target.value)} />
-        </div>
-      </div>
-      <div className="form-row">
-        <div className="field">
-          <label>부서 *</label>
-          <select className="select" value={form.department} onChange={(e) => set('department', e.target.value)}>
-            {departments.length === 0 && <option value="">부서 없음</option>}
-            {departments.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="field">
-          <label>직급</label>
-          <input className="input" value={form.position} onChange={(e) => set('position', e.target.value)} />
-        </div>
-      </div>
-      <div className="field">
-        <label>담당 업무 * (유해인자 노출 판단 근거)</label>
-        <input className="input" value={form.jobTitle} onChange={(e) => set('jobTitle', e.target.value)} />
-      </div>
-      <div className="form-row">
-        <div className="field">
-          <label>입사일 *</label>
-          <input className="input" type="date" value={form.hireDate} onChange={(e) => set('hireDate', e.target.value)} />
-        </div>
-        <div className="field">
-          <label>생년월일 (나이대 통계용)</label>
-          <input className="input" type="date" value={form.birthDate} onChange={(e) => set('birthDate', e.target.value)} />
-        </div>
-      </div>
-      <div className="form-row">
-        <div className="field">
-          <label>성별</label>
-          <select className="select" value={form.gender} onChange={(e) => set('gender', e.target.value as EmpForm['gender'])}>
-            <option value="">선택 안 함</option>
-            <option value="M">남</option>
-            <option value="F">여</option>
-          </select>
-        </div>
-        <div className="field">
-          <label>국적</label>
-          <select
-            className="select"
-            value={form.nationality}
-            onChange={(e) => set('nationality', e.target.value as EmpForm['nationality'])}
-          >
-            <option value="domestic">내국인</option>
-            <option value="foreign">외국인</option>
-          </select>
-        </div>
-      </div>
-      <div className="field">
-        <label>연락처</label>
-        <input className="input" value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="010-0000-0000" />
       </div>
     </Modal>
   );
