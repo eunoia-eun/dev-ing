@@ -11,6 +11,7 @@ import { LabGroupService } from '@application/usecases/LabGroupService';
 import { CheckupTypeService } from '@application/usecases/CheckupTypeService';
 import { StatisticsService } from '@application/usecases/StatisticsService';
 import { AuthService } from '@application/usecases/AuthService';
+import { WorkplaceMeasurementService } from '@application/usecases/WorkplaceMeasurementService';
 
 import { StaticHazardCatalogProvider } from '@infrastructure/seed/hazardCatalog';
 import { StaticHazardHealthProvider } from '@infrastructure/seed/hazardHealthDetails';
@@ -20,6 +21,7 @@ import { WebCryptoHasher } from '@infrastructure/system/WebCryptoHasher';
 import { LocalStorageAccountRepository } from '@infrastructure/repositories/LocalStorageAccountRepository';
 import {
   LocalAssignmentRepository,
+  LocalWorkplaceMeasurementRepository,
   LocalDepartmentRepository,
   LocalDepartmentHazardRepository,
   LocalLabItemRepository,
@@ -53,6 +55,7 @@ export interface AppServices {
   labGroups: LabGroupService;
   checkupTypes: CheckupTypeService;
   statistics: StatisticsService;
+  measurement: WorkplaceMeasurementService;
 }
 
 /**
@@ -81,6 +84,7 @@ export function createAppServices(): AppServices {
   const healthProvider = new StaticHazardHealthProvider();
   const accountRepo = new LocalStorageAccountRepository();
   const hasher = new WebCryptoHasher();
+  const workMeasurementRepo = new LocalWorkplaceMeasurementRepository();
 
   const employees = new EmployeeService(employeeRepo, ids);
   const symptom = new SymptomService(visitRepo, medicineRepo, movementRepo, clock, ids);
@@ -126,5 +130,6 @@ export function createAppServices(): AppServices {
       enrollmentRepo,
       clock,
     ),
+    measurement: new WorkplaceMeasurementService(workMeasurementRepo, ids),
   };
 }

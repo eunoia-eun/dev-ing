@@ -8,6 +8,7 @@ import type { CheckupTypeItem, HealthCheckup, LabGroup, LabItem } from '@domain/
 import type { Department } from '@domain/department/Department';
 import type { DepartmentHazard } from '@domain/hazard/DepartmentHazard';
 import type { InventoryMovement } from '@domain/inventory/InventoryMovement';
+import type { WorkplaceMeasurement } from '@domain/measurement/WorkplaceMeasurement';
 import type { ISODate } from '@domain/shared/types';
 
 import { EmployeeService } from '@application/usecases/EmployeeService';
@@ -23,6 +24,7 @@ import { LabGroupService } from '@application/usecases/LabGroupService';
 import { CheckupTypeService } from '@application/usecases/CheckupTypeService';
 import { StatisticsService } from '@application/usecases/StatisticsService';
 import { AuthService } from '@application/usecases/AuthService';
+import { WorkplaceMeasurementService } from '@application/usecases/WorkplaceMeasurementService';
 import type { IPasswordHasher } from '@application/ports/IPasswordHasher';
 import type { AppServices } from '@composition/container';
 import { StaticHazardCatalogProvider } from '@infrastructure/seed/hazardCatalog';
@@ -31,6 +33,7 @@ import { StaticHazardHealthProvider } from '@infrastructure/seed/hazardHealthDet
 import { FixedClock, SeqIdGenerator } from './fakes';
 import {
   InMemoryAccountRepository,
+  InMemoryWorkplaceMeasurementRepository,
   InMemoryAssignmentRepository,
   InMemoryDepartmentRepository,
   InMemoryDepartmentHazardRepository,
@@ -72,6 +75,7 @@ export interface SeedInput {
   checkupTypes?: CheckupTypeItem[];
   movements?: InventoryMovement[];
   departmentHazards?: DepartmentHazard[];
+  workMeasurements?: WorkplaceMeasurement[];
 }
 
 export interface TestRepos {
@@ -89,6 +93,7 @@ export interface TestRepos {
   checkupTypes: InMemoryCheckupTypeRepository;
   movements: InMemoryInventoryMovementRepository;
   departmentHazards: InMemoryDepartmentHazardRepository;
+  workMeasurements: InMemoryWorkplaceMeasurementRepository;
 }
 
 export interface TestContext {
@@ -125,6 +130,7 @@ export function buildTestServices(
     checkupTypes: new InMemoryCheckupTypeRepository(seed.checkupTypes),
     movements: new InMemoryInventoryMovementRepository(seed.movements),
     departmentHazards: new InMemoryDepartmentHazardRepository(seed.departmentHazards),
+    workMeasurements: new InMemoryWorkplaceMeasurementRepository(seed.workMeasurements),
   };
   const catalogProvider = new StaticHazardCatalogProvider();
   const healthProvider = new StaticHazardHealthProvider();
@@ -173,6 +179,7 @@ export function buildTestServices(
       repos.enrollments,
       clock,
     ),
+    measurement: new WorkplaceMeasurementService(repos.workMeasurements, ids),
   };
 
   return { services, repos, clock, ids };

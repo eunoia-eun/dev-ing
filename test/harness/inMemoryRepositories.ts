@@ -9,7 +9,9 @@ import type { Department } from '@domain/department/Department';
 import type { DepartmentHazard } from '@domain/hazard/DepartmentHazard';
 import type { InventoryMovement } from '@domain/inventory/InventoryMovement';
 import type { Account } from '@domain/auth/Account';
+import type { WorkplaceMeasurement } from '@domain/measurement/WorkplaceMeasurement';
 import type { Id } from '@domain/shared/types';
+import type { WorkplaceMeasurementRepository } from '@application/ports/WorkplaceMeasurementRepository';
 
 import type { EmployeeRepository } from '@application/ports/EmployeeRepository';
 import type { AssignmentRepository } from '@application/ports/AssignmentRepository';
@@ -370,5 +372,23 @@ export class InMemoryAccountRepository implements IAccountRepository {
   }
   list() {
     return Promise.resolve(this.store.all());
+  }
+}
+
+export class InMemoryWorkplaceMeasurementRepository implements WorkplaceMeasurementRepository {
+  private store: InMemoryStore<WorkplaceMeasurement>;
+  constructor(seed: WorkplaceMeasurement[] = []) {
+    this.store = new InMemoryStore(seed);
+  }
+  list() {
+    return Promise.resolve(this.store.all());
+  }
+  save(m: WorkplaceMeasurement) {
+    this.store.upsert(m);
+    return Promise.resolve();
+  }
+  remove(id: string) {
+    this.store.remove(id);
+    return Promise.resolve();
   }
 }

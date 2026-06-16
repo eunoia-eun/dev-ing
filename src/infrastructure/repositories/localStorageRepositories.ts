@@ -1,4 +1,6 @@
 import type { Employee, EmployeeId } from '@domain/employee/Employee';
+import type { WorkplaceMeasurement } from '@domain/measurement/WorkplaceMeasurement';
+import type { WorkplaceMeasurementRepository } from '@application/ports/WorkplaceMeasurementRepository';
 import type { Assignment } from '@domain/employee/Assignment';
 import type { ExposureRecord } from '@domain/hazard/ExposureAssessment';
 import type { Medicine } from '@domain/symptom/Medicine';
@@ -303,6 +305,21 @@ export class LocalHealthCheckupRepository implements HealthCheckupRepository {
     return Promise.resolve();
   }
   remove(id: Id) {
+    this.store.remove(id);
+    return Promise.resolve();
+  }
+}
+
+export class LocalWorkplaceMeasurementRepository implements WorkplaceMeasurementRepository {
+  private store = new LocalStorageStore<WorkplaceMeasurement>('workMeasurements', []);
+  list() {
+    return Promise.resolve(this.store.all());
+  }
+  save(m: WorkplaceMeasurement) {
+    this.store.upsert(m);
+    return Promise.resolve();
+  }
+  remove(id: string) {
     this.store.remove(id);
     return Promise.resolve();
   }

@@ -18,6 +18,7 @@ const NAV: NavItem[] = [
   { to: '/program', label: '건강프로그램', icon: '🏃', title: '건강프로그램 신청·참여 현황', sub: '프로그램 모집·신청·참여율 관리' },
   { to: '/stats', label: '통계', icon: '📊', title: '통계', sub: '검진 유소견 현황 · 월별 상담/내원·약 반출 (부서·연령·성별)' },
   { to: '/catalog', label: '유해인자 카탈로그', icon: '📚', title: '유해인자 카탈로그', sub: '별표22 유해인자별 건강장해 + 우리 회사 사용·부서별 유해인자 조회' },
+  { to: '/measurement', label: '작업환경측정', icon: '🔬', title: '작업환경측정 관리', sub: '유해인자별 TWA·STEL 측정값 등록 및 법적 노출기준 초과 여부 자동 판정' },
 ];
 
 export function Layout() {

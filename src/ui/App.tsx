@@ -16,6 +16,7 @@ import { EmployeeHealthPage } from './pages/employee/EmployeeHealthPage';
 import { EmployeeProgramPage } from './pages/employee/EmployeeProgramPage';
 import { LoginPage } from './pages/LoginPage';
 import { AccountSettingsPage } from './pages/AccountSettingsPage';
+import { WorkplaceMeasurementPage } from './pages/WorkplaceMeasurementPage';
 
 function ProfileRedirect() {
   const { id } = useParams();
@@ -64,6 +65,7 @@ function AppRoutes() {
         <Route index element={<DashboardPage />} />
         <Route path="hazard" element={<Navigate to="/profile" replace />} />
         <Route path="catalog" element={<CatalogPage />} />
+        <Route path="measurement" element={<WorkplaceMeasurementPage />} />
         <Route path="symptom" element={<SymptomPage />} />
         <Route path="medicine" element={<MedicinePage />} />
         <Route path="program" element={<ProgramPage />} />
