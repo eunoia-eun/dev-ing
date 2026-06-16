@@ -3,7 +3,7 @@ import { useServices } from '../ServicesContext';
 import { useAsync } from '../hooks/useAsync';
 import { ErrorAlert } from '../components/ui';
 import type { ExceedanceStatus, WorkplaceMeasurement } from '@domain/measurement/WorkplaceMeasurement';
-import type { HazardCategory, HazardSubstance } from '@domain/hazard/HazardousSubstance';
+import type { HazardCategory, HazardCategoryCode, HazardSubstance } from '@domain/hazard/HazardousSubstance';
 
 // ─── 상태 뱃지 ──────────────────────────────────────────────
 const STATUS_MAP: Record<ExceedanceStatus, { label: string; color: string; bg: string }> = {
@@ -27,7 +27,6 @@ interface SubstancePick {
   name: string;
   limitTwa?: string;
   limitStel?: string;
-  unit: string;
 }
 
 function SubstancePicker({
@@ -42,6 +41,10 @@ function SubstancePicker({
   const [results, setResults] = useState<Array<{ category: HazardCategory; substance: HazardSubstance }>>([]);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (value?.name !== undefined) setQuery(value.name);
+  }, [value?.name]);
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -68,13 +71,7 @@ function SubstancePicker({
     const detail = await hazard.getHealthDetail({ categoryCode: cat.code, substanceNo: sub.no });
     const limitTwa = detail?.exposureLimitKr?.twa;
     const limitStel = detail?.exposureLimitKr?.stel;
-    // 단위 추출 (예: "300 ppm" → "ppm")
-    const rawUnit = limitTwa ?? limitStel ?? '';
-    const unitMatch = rawUnit.replace(/^C\s+/i, '').match(/[\d.]+\s*(.+)/);
-    const unit = unitMatch
-      ? unitMatch[1].trim().replace('㎎/㎥', 'mg/m³').replace('㎍/㎥', 'µg/m³').replace('㎎', 'mg')
-      : 'ppm';
-    onSelect({ code, name: sub.nameKo, limitTwa, limitStel, unit });
+    onSelect({ code, name: sub.nameKo, limitTwa, limitStel });
     setQuery(sub.nameKo);
     setOpen(false);
   }
@@ -123,17 +120,21 @@ const EMPTY_FORM = {
   department: '',
   twa: '',
   stel: '',
+  unit: '',
+  limitTwa: '',
+  limitStel: '',
   note: '',
 };
 
 export function WorkplaceMeasurementPage() {
-  const { measurement, departments } = useServices();
+  const { measurement, departments, hazard } = useServices();
 
   const [filterDept, setFilterDept] = useState('');
   const [reload, setReload] = useState(0);
   const refresh = () => setReload((n) => n + 1);
 
   const deptList = useAsync(() => departments.list(), []);
+  const allDeptHazards = useAsync(() => hazard.getDepartmentHazards(), []);
   const results = useAsync(() => measurement.list(filterDept || undefined), [filterDept, reload]);
 
   // 모달 상태
@@ -150,9 +151,31 @@ export function WorkplaceMeasurementPage() {
     setShowModal(true);
   }
 
+  async function handleChipSelect(categoryCode: HazardCategoryCode, substanceNo: number, substanceName: string) {
+    const code = `${categoryCode}-${substanceNo}`;
+    const detail = await hazard.getHealthDetail({ categoryCode, substanceNo });
+    handleSubstanceSelect({
+      code,
+      name: substanceName,
+      limitTwa: detail?.exposureLimitKr?.twa,
+      limitStel: detail?.exposureLimitKr?.stel,
+    });
+  }
+
+  function handleSubstanceSelect(p: SubstancePick) {
+    setPick(p);
+    const rawUnit = p.limitTwa ?? p.limitStel ?? '';
+    const unitMatch = rawUnit.replace(/^C\s+/i, '').match(/[\d.]+\s*(.+)/);
+    const unit = unitMatch
+      ? unitMatch[1].trim().replace('㎎/㎥', 'mg/m³').replace('㎍/㎥', 'µg/m³').replace('㎎', 'mg')
+      : '';
+    setForm(prev => ({ ...prev, unit, limitTwa: p.limitTwa ?? '', limitStel: p.limitStel ?? '' }));
+  }
+
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!pick) { setSaveError('유해인자를 선택해 주세요.'); return; }
+    if (!form.unit.trim()) { setSaveError('단위를 입력해 주세요.'); return; }
     setSaveError(null);
     setSaving(true);
     try {
@@ -163,9 +186,9 @@ export function WorkplaceMeasurementPage() {
         substanceName: pick.name,
         twa: form.twa !== '' ? parseFloat(form.twa) : undefined,
         stel: form.stel !== '' ? parseFloat(form.stel) : undefined,
-        unit: pick.unit,
-        limitTwa: pick.limitTwa,
-        limitStel: pick.limitStel,
+        unit: form.unit.trim(),
+        limitTwa: form.limitTwa.trim() || undefined,
+        limitStel: form.limitStel.trim() || undefined,
         note: form.note.trim() || undefined,
       };
       await measurement.add(dto);
@@ -286,20 +309,89 @@ export function WorkplaceMeasurementPage() {
 
               <div className="field" style={{ marginBottom: 0 }}>
                 <label>유해인자 *</label>
-                <SubstancePicker value={pick} onSelect={setPick} />
-                {pick?.limitTwa && (
-                  <div style={{ marginTop: 4, fontSize: 11.5, color: '#2563eb' }}>
-                    노출기준 — TWA: {pick.limitTwa}{pick.limitStel ? ` / STEL: ${pick.limitStel}` : ''}
+                {/* 부서 등록 유해인자 칩 */}
+                {(() => {
+                  const chips = (allDeptHazards.data ?? []).filter((dh) => dh.department === form.department);
+                  if (!form.department || chips.length === 0) return null;
+                  return (
+                    <div style={{ marginBottom: 6, padding: '8px 10px', background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
+                      <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 5 }}>이 부서의 등록 유해인자</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                        {chips.map((dh) => {
+                          const code = `${dh.categoryCode}-${dh.substanceNo}`;
+                          const selected = pick?.code === code;
+                          return (
+                            <button
+                              key={dh.id}
+                              type="button"
+                              onClick={() => handleChipSelect(dh.categoryCode, dh.substanceNo, dh.substanceName)}
+                              style={{
+                                fontSize: 12, padding: '3px 10px', borderRadius: 20,
+                                border: `1px solid ${selected ? '#2563eb' : '#d1d5db'}`,
+                                background: selected ? '#eff6ff' : '#fff',
+                                color: selected ? '#2563eb' : '#374151',
+                                cursor: 'pointer', fontWeight: 500, transition: 'all .15s',
+                              }}
+                            >
+                              {dh.substanceName}
+                              {dh.process && <span style={{ color: '#9ca3af', marginLeft: 4, fontSize: 11 }}>({dh.process})</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div style={{ marginTop: 6, fontSize: 11, color: '#9ca3af' }}>목록에 없으면 아래에서 검색해 주세요.</div>
+                    </div>
+                  );
+                })()}
+                {/* 전체 카탈로그 검색 */}
+                <SubstancePicker value={pick} onSelect={handleSubstanceSelect} />
+                {pick && !pick.limitTwa && !pick.limitStel && (
+                  <div style={{ marginTop: 4, fontSize: 11.5, color: '#d97706' }}>
+                    ⚠ 이 물질의 기준 정보가 없어요. 단위와 기준값을 직접 입력해 주세요.
                   </div>
                 )}
-                {pick && !pick.limitTwa && !pick.limitStel && (
-                  <div style={{ marginTop: 4, fontSize: 11.5, color: '#9ca3af' }}>이 물질의 노출기준 정보가 없어요.</div>
+                {pick?.limitTwa && (
+                  <div style={{ marginTop: 4, fontSize: 11.5, color: '#2563eb' }}>
+                    ✓ 법적 노출기준이 자동으로 채워졌어요. 필요하면 수정할 수 있어요.
+                  </div>
                 )}
+              </div>
+
+              <div className="field" style={{ marginBottom: 0 }}>
+                <label>단위 *</label>
+                <input
+                  className="input"
+                  value={form.unit}
+                  onChange={(e) => setForm({ ...form, unit: e.target.value })}
+                  placeholder="예) ppm, mg/m³, dB(A), m/s²"
+                  required
+                />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
                 <div className="field" style={{ marginBottom: 0 }}>
-                  <label>TWA 측정값 {pick?.unit ? `(${pick.unit})` : ''}</label>
+                  <label>TWA 기준</label>
+                  <input
+                    className="input"
+                    value={form.limitTwa}
+                    onChange={(e) => setForm({ ...form, limitTwa: e.target.value })}
+                    placeholder="예) 300 ppm"
+                  />
+                </div>
+                <div className="field" style={{ marginBottom: 0 }}>
+                  <label>STEL 기준</label>
+                  <input
+                    className="input"
+                    value={form.limitStel}
+                    onChange={(e) => setForm({ ...form, limitStel: e.target.value })}
+                    placeholder="선택"
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                <div className="field" style={{ marginBottom: 0 }}>
+                  <label>TWA 측정값 {form.unit ? `(${form.unit})` : ''}</label>
                   <input
                     className="input"
                     type="number"
@@ -311,7 +403,7 @@ export function WorkplaceMeasurementPage() {
                   />
                 </div>
                 <div className="field" style={{ marginBottom: 0 }}>
-                  <label>STEL 측정값 {pick?.unit ? `(${pick.unit})` : ''}</label>
+                  <label>STEL 측정값 {form.unit ? `(${form.unit})` : ''}</label>
                   <input
                     className="input"
                     type="number"

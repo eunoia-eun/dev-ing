@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { HEALTH_GRADE_LABEL, gradeTone, type HealthGrade } from '@domain/checkup/HealthCheckup';
 import {
   AGE_BUCKETS,
@@ -59,6 +60,7 @@ export function StatisticsPage() {
   return (
     <div className="stack">
       <WorkforceCard />
+      <OccupationalSubjectsCard />
 
       <div className="toolbar">
         <span className="muted small" style={{ alignSelf: 'center' }}>
@@ -90,6 +92,135 @@ function ExcelButton({ onClick }: { onClick: () => void }) {
     <button className="btn btn--sm" onClick={onClick} title="엑셀(CSV) 다운로드">
       ⬇ 엑셀
     </button>
+  );
+}
+
+// ── 직업병 소견 관리대상자 조회 ──────────────────────────────────────────────
+function todayISO(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+function daysAgoISO(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return d.toISOString().slice(0, 10);
+}
+
+function OccupationalSubjectsCard() {
+  const { statistics } = useServices();
+  const [from, setFrom] = useState(daysAgoISO(365));
+  const [to, setTo] = useState(todayISO);
+  const [query, setQuery] = useState({ from: daysAgoISO(365), to: todayISO() });
+  const result = useAsync(
+    () => statistics.getOccupationalSubjects(query.from, query.to),
+    [query.from, query.to],
+  );
+
+  function search() { setQuery({ from, to }); }
+
+  function exportCsv() {
+    const rows = result.data ?? [];
+    const header = ['이름', '부서', '검진종류', '검진일', '판정', '소견', '진행중 노출 수'];
+    const body = rows.map((r) => [r.name, r.department, r.checkupType, r.examDate, r.gradeLabel, r.opinion ?? '', r.activeExposureCount]);
+    downloadCsv(`직업병소견자_${query.from}_${query.to}.csv`, [header, ...body]);
+  }
+
+  const rows = result.data ?? [];
+  const gradeCount: Record<string, number> = {};
+  for (const r of rows) gradeCount[r.grade] = (gradeCount[r.grade] ?? 0) + 1;
+
+  return (
+    <Card>
+      <div className="row spread" style={{ marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+        <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800 }}>직업병 관련 소견 관리대상자</h3>
+        {rows.length > 0 && <ExcelButton onClick={exportCsv} />}
+      </div>
+
+      {/* 조회 기간 설정 */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', marginBottom: 14 }}>
+        <span className="muted small">조회 기간</span>
+        <input
+          type="date" className="input" style={{ width: 140 }}
+          value={from} onChange={(e) => setFrom(e.target.value)}
+        />
+        <span className="muted small">~</span>
+        <input
+          type="date" className="input" style={{ width: 140 }}
+          value={to} onChange={(e) => setTo(e.target.value)}
+        />
+        <button className="btn btn--primary btn--sm" onClick={search}>조회</button>
+        <button className="btn btn--ghost btn--sm" onClick={() => { const f = daysAgoISO(365); const t = todayISO(); setFrom(f); setTo(t); setQuery({ from: f, to: t }); }}>
+          최근 1년
+        </button>
+        <button className="btn btn--ghost btn--sm" onClick={() => { const f = daysAgoISO(90); const t = todayISO(); setFrom(f); setTo(t); setQuery({ from: f, to: t }); }}>
+          최근 3개월
+        </button>
+      </div>
+
+      {result.loading && <Spinner />}
+      {result.error && <ErrorAlert message={result.error} />}
+
+      {!result.loading && !result.error && (
+        <>
+          {/* 요약 뱃지 */}
+          {rows.length > 0 && (
+            <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+              <span className="muted small">총 {rows.length}명</span>
+              {(['C1', 'D1', 'D2'] as HealthGrade[]).map((g) =>
+                gradeCount[g] ? (
+                  <span key={g} className={`badge badge--${gradeTone(g)}`} style={{ fontSize: 12 }}>
+                    {HEALTH_GRADE_LABEL[g]} {gradeCount[g]}명
+                  </span>
+                ) : null,
+              )}
+            </div>
+          )}
+
+          {rows.length === 0 ? (
+            <EmptyState>{query.from} ~ {query.to} 기간에 C1·D1·D2 소견자가 없어요.</EmptyState>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                    {['이름', '부서', '검진일', '판정', '소견', '진행중 노출'].map((h) => (
+                      <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: '#374151', whiteSpace: 'nowrap' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((r) => (
+                    <tr key={r.employeeId} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                      <td style={{ padding: '9px 12px', fontWeight: 600 }}>
+                        <Link to={`/employees/${r.employeeId}`} style={{ color: '#2563eb', textDecoration: 'none' }}>
+                          {r.name}
+                        </Link>
+                      </td>
+                      <td style={{ padding: '9px 12px', color: '#6b7280' }}>{r.department}</td>
+                      <td style={{ padding: '9px 12px', whiteSpace: 'nowrap' }}>{formatDate(r.examDate)}</td>
+                      <td style={{ padding: '9px 12px' }}>
+                        <span className={`badge badge--${gradeTone(r.grade)}`} style={{ fontSize: 12 }}>
+                          {r.gradeLabel}
+                        </span>
+                      </td>
+                      <td style={{ padding: '9px 12px', color: '#6b7280', fontSize: 12, maxWidth: 200 }}>
+                        {r.opinion ?? <span style={{ color: '#d1d5db' }}>-</span>}
+                      </td>
+                      <td style={{ padding: '9px 12px', textAlign: 'center' }}>
+                        {r.activeExposureCount > 0 ? (
+                          <span style={{ fontWeight: 700, color: '#d97706' }}>{r.activeExposureCount}건</span>
+                        ) : (
+                          <span style={{ color: '#d1d5db' }}>-</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+    </Card>
   );
 }
 

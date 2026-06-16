@@ -137,7 +137,7 @@ function ProfileView({
   onReload: () => void;
 }) {
   const { checkup, hazard } = useServices();
-  const { employee: e, exposures, recentVisits, recentSymptoms, recentMedications, checkups, latestCheckup } = profile;
+  const { employee: e, exposures, recentVisits, recentSymptoms, recentMedications, checkups, latestCheckup, occupationalAlerts } = profile;
   // exposureAdd: null=닫힘, 문자열=새 노출의 기본 시작일(배치 시작일/오늘)
   const [exposureAdd, setExposureAdd] = useState<string | null>(null);
   const [assignChange, setAssignChange] = useState(false);
@@ -320,6 +320,39 @@ function ProfileView({
 
   return (
     <div className="stack">
+      {/* 직업병 연관 검토 필요 배너 */}
+      {occupationalAlerts.length > 0 && (
+        <div style={{
+          background: '#fff7ed', border: '1.5px solid #f97316',
+          borderRadius: 10, padding: '12px 16px', display: 'flex', gap: 10, alignItems: 'flex-start',
+        }}>
+          <span style={{ fontSize: 20, lineHeight: 1.2 }}>⚠️</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, color: '#c2410c', fontSize: 14, marginBottom: 4 }}>
+              직업병 연관 검토 필요
+            </div>
+            <div style={{ fontSize: 12.5, color: '#7c2d12', lineHeight: 1.6 }}>
+              최근 검진 판정 <strong>{HEALTH_GRADE_LABEL[occupationalAlerts[0].grade]}</strong>
+              ({formatDate(occupationalAlerts[0].checkupDate)})이고 현재 유해인자에 노출 중이에요.
+              직업병 연관 여부를 확인해 주세요.
+              {occupationalAlerts[0].opinion && (
+                <span style={{ marginLeft: 4, color: '#9a3412' }}>소견: {occupationalAlerts[0].opinion}</span>
+              )}
+            </div>
+            <div style={{ marginTop: 6, display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+              {occupationalAlerts.map((a) => (
+                <span key={a.substanceCode} style={{
+                  fontSize: 12, padding: '2px 9px', borderRadius: 20,
+                  background: '#fed7aa', color: '#9a3412', fontWeight: 600,
+                }}>
+                  {a.substanceName}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 헤더 */}
       <Card>
         <div className="row spread row--wrap" style={{ alignItems: 'flex-start', gap: 12 }}>

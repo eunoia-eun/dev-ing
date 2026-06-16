@@ -1,5 +1,6 @@
 import {
   gradeCategory,
+  HEALTH_GRADE_LABEL,
   type GradeCategory,
   type HealthGrade,
 } from '@domain/checkup/HealthCheckup';
@@ -60,6 +61,19 @@ export interface CheckupFindingStats {
   rows: CheckupGroupRow[];
   /** 관리대상자(요관찰·유소견·재검) 명단 — 심각도순 */
   managed: ManagedEmployee[];
+}
+
+/** 직업병 관련 소견(C1·D1·D2) 관리대상자 1건 */
+export interface OccupationalSubject {
+  employeeId: string;
+  name: string;
+  department: string;
+  checkupType: string;
+  examDate: ISODate;
+  grade: HealthGrade;
+  gradeLabel: string;
+  opinion?: string;
+  activeExposureCount: number;
 }
 
 export interface MonthlyActivityStats {
@@ -458,6 +472,55 @@ export class StatisticsService {
   }
 
   /** 기록된 증상 목록(빈도 많은 순) — 증상 추이 선택용 */
+  /**
+   * 조회 기간 내 C1·D1·D2 소견을 받은 임직원 목록.
+   * 같은 임직원이 기간 내 여러 검진을 받은 경우 가장 최근 검진 1건만 반환.
+   */
+  async getOccupationalSubjects(from: ISODate, to: ISODate): Promise<OccupationalSubject[]> {
+    const GRADES: HealthGrade[] = ['C1', 'D1', 'D2'];
+    const [allEmployees, allCheckups, allExposures] = await Promise.all([
+      this.employees.list(),
+      this.checkups.list(),
+      this.exposures.list(),
+    ]);
+    const empById = new Map(allEmployees.map((e) => [e.id, e]));
+
+    // 기간 내 C1/D1/D2 검진만 추림
+    const filtered = allCheckups.filter(
+      (c) => GRADES.includes(c.grade) && c.examDate >= from && c.examDate <= to,
+    );
+
+    // 임직원별 가장 최근 검진 1건
+    const latestByEmp = new Map<string, typeof filtered[number]>();
+    for (const c of filtered) {
+      const prev = latestByEmp.get(c.employeeId);
+      if (!prev || c.examDate > prev.examDate) latestByEmp.set(c.employeeId, c);
+    }
+
+    // 진행 중 노출 수 집계
+    const activeByEmp = new Map<string, number>();
+    for (const exp of allExposures) {
+      if (!exp.endDate) activeByEmp.set(exp.employeeId, (activeByEmp.get(exp.employeeId) ?? 0) + 1);
+    }
+
+    return [...latestByEmp.values()]
+      .map((c) => {
+        const emp = empById.get(c.employeeId);
+        return {
+          employeeId: c.employeeId,
+          name: emp?.name ?? '(퇴직)',
+          department: emp?.department ?? '-',
+          checkupType: c.type,
+          examDate: c.examDate,
+          grade: c.grade,
+          gradeLabel: HEALTH_GRADE_LABEL[c.grade],
+          opinion: c.opinion,
+          activeExposureCount: activeByEmp.get(c.employeeId) ?? 0,
+        };
+      })
+      .sort((a, b) => b.examDate.localeCompare(a.examDate));
+  }
+
   async getSymptomOptions(): Promise<SymptomOption[]> {
     const visits = await this.visits.list();
     const count = new Map<string, number>();

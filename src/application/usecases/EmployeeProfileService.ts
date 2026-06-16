@@ -2,6 +2,8 @@ import type { Employee, EmployeeId } from '@domain/employee/Employee';
 import type { ExposureAssessment } from '@domain/hazard/ExposureAssessment';
 import type { SymptomVisit } from '@domain/symptom/Symptom';
 import type { HealthCheckup } from '@domain/checkup/HealthCheckup';
+import type { OccupationalDiseaseAlert } from '@domain/hazard/occupationalDiseaseAlert';
+import { detectOccupationalDiseaseAlerts } from '@domain/hazard/occupationalDiseaseAlert';
 import type { EmployeeService } from './EmployeeService';
 import type { SymptomService } from './SymptomService';
 import type { HazardExposureService } from './HazardExposureService';
@@ -21,6 +23,8 @@ export interface EmployeeHealthProfile {
   /** 건강검진 결과(사후관리소견) 최신순 */
   checkups: HealthCheckup[];
   latestCheckup?: HealthCheckup;
+  /** 직업병 연관 검토 필요 알림 (최근 검진 C1/D1/D2 + 진행 중 노출 병존 시 생성) */
+  occupationalAlerts: OccupationalDiseaseAlert[];
 }
 
 function dedupe(items: string[]): string[] {
@@ -48,6 +52,10 @@ export class EmployeeProfileService {
     ]);
     if (!employee) throw new Error('임직원을 찾을 수 없어요.');
 
+    const activeExposures = exposures
+      .filter((a) => a.status !== 'ended')
+      .map((a) => a.record);
+
     return {
       employee,
       exposures,
@@ -58,6 +66,7 @@ export class EmployeeProfileService {
       ).slice(0, 12),
       checkups,
       latestCheckup: checkups[0],
+      occupationalAlerts: detectOccupationalDiseaseAlerts(checkups, activeExposures),
     };
   }
 }
