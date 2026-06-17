@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "build:standalone": "tsc --noEmit && vite build --config vite.config.standalone.ts",
+    "build:standalone": "tsc --noEmit && vite build --config vite.config.standalone.ts && node -e \"require('fs').copyFileSync('dist-standalone/index.html','standalone.html')\"",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
