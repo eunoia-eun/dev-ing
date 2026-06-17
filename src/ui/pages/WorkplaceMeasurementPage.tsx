@@ -215,24 +215,36 @@ function RoundModal({
   );
 }
 
-// ── 측정결과 등록 모달 ────────────────────────────────────────────────────
+// ── 측정결과 등록/수정 모달 ──────────────────────────────────────────────
 const EMPTY_MEAS_FORM = {
   measureDate: new Date().toISOString().slice(0, 10),
   department: '', twa: '', stel: '', unit: '', limitTwa: '', limitStel: '', note: '',
 };
 
 function MeasurementFormModal({
-  roundId, depts, deptHazards, onSave, onClose,
+  roundId, editing, depts, deptHazards, onSave, onClose,
 }: {
   roundId: string;
+  editing?: WorkplaceMeasurement;
   depts: Array<{ id: string; name: string }>;
   deptHazards: DepartmentHazard[];
   onSave: (dto: Omit<WorkplaceMeasurement, 'id'>) => Promise<void>;
   onClose: () => void;
 }) {
   const { hazard } = useServices();
-  const [form, setForm] = useState(EMPTY_MEAS_FORM);
-  const [pick, setPick] = useState<SubstancePick | null>(null);
+  const [form, setForm] = useState(editing ? {
+    measureDate: editing.measureDate,
+    department:  editing.department,
+    twa:         editing.twa  !== undefined ? String(editing.twa)  : '',
+    stel:        editing.stel !== undefined ? String(editing.stel) : '',
+    unit:        editing.unit,
+    limitTwa:    editing.limitTwa  ?? '',
+    limitStel:   editing.limitStel ?? '',
+    note:        editing.note ?? '',
+  } : EMPTY_MEAS_FORM);
+  const [pick, setPick] = useState<SubstancePick | null>(
+    editing ? { code: editing.substanceCode, name: editing.substanceName, limitTwa: editing.limitTwa, limitStel: editing.limitStel } : null
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -280,7 +292,7 @@ function MeasurementFormModal({
   const chips = deptHazards.filter((dh) => dh.department === form.department);
 
   return (
-    <ModalWrap title="측정결과 등록" onClose={onClose}>
+    <ModalWrap title={editing ? '측정결과 수정' : '측정결과 등록'} onClose={onClose}>
       <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <Field label="측정일 *">
           <input className="input" type="date" value={form.measureDate} onChange={(e) => setForm({ ...form, measureDate: e.target.value })} required />
@@ -346,7 +358,7 @@ function MeasurementFormModal({
         {error && <ErrorAlert message={error} />}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 4 }}>
           <button type="button" className="btn btn--ghost" onClick={onClose}>취소</button>
-          <button type="submit" className="btn btn--primary" disabled={saving}>{saving ? '등록 중...' : '등록'}</button>
+          <button type="submit" className="btn btn--primary" disabled={saving}>{saving ? (editing ? '저장 중...' : '등록 중...') : editing ? '저장' : '등록'}</button>
         </div>
       </form>
     </ModalWrap>
@@ -506,9 +518,10 @@ function ImportPreviewModal({
 
 // ── 측정 결과 테이블 (공용) ───────────────────────────────────────────────
 function MeasurementTable({
-  assessments, onRemove,
+  assessments, onEdit, onRemove,
 }: {
   assessments: MeasurementAssessment[];
+  onEdit?: (m: WorkplaceMeasurement) => void;
   onRemove: (id: string) => void;
 }) {
   if (assessments.length === 0) return null;
@@ -532,8 +545,9 @@ function MeasurementTable({
               <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}><ValueCell measured={m.stel} limit={m.limitStel} unit={m.unit} status={stelStatus} /></td>
               <td style={{ padding: '8px 10px' }}><StatusBadge status={overallStatus} /></td>
               <td style={{ padding: '8px 10px', color: '#6b7280', fontSize: 12 }}>{m.note ?? ''}</td>
-              <td style={{ padding: '8px 10px' }}>
-                <button className="btn btn--ghost btn--sm" style={{ color: '#ef4444', fontSize: 11 }} onClick={() => onRemove(m.id)}>삭제</button>
+              <td style={{ padding: '8px 10px', whiteSpace: 'nowrap' }}>
+                {onEdit && <button className="btn btn--ghost btn--sm" style={{ fontSize: 11 }} onClick={() => onEdit(m)}>수정</button>}
+                <button className="btn btn--ghost btn--sm" style={{ color: '#ef4444', fontSize: 11, marginLeft: onEdit ? 4 : 0 }} onClick={() => onRemove(m.id)}>삭제</button>
               </td>
             </tr>
           ))}
@@ -561,7 +575,7 @@ function downloadCsvTemplate() {
 // ── 측정 회차 카드 ────────────────────────────────────────────────────────
 function RoundCard({
   round, measurements, documents, filterDept,
-  onMeasurementAdd, onMeasurementRemove,
+  onMeasurementAdd, onMeasurementEdit, onMeasurementRemove,
   onDocUpload, onDocRemove, onDocDownload,
   onEdit, onRemove, depts, deptHazards,
 }: {
@@ -570,6 +584,7 @@ function RoundCard({
   documents: MeasurementDocument[];
   filterDept: string;
   onMeasurementAdd: (dto: Omit<WorkplaceMeasurement, 'id'>) => Promise<void>;
+  onMeasurementEdit: (id: string, patch: Partial<Omit<WorkplaceMeasurement, 'id'>>) => Promise<void>;
   onMeasurementRemove: (id: string) => void;
   onDocUpload: (roundId: string, file: File) => Promise<void>;
   onDocRemove: (docId: string) => void;
@@ -582,6 +597,7 @@ function RoundCard({
   const [expanded, setExpanded] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [showMeasModal, setShowMeasModal] = useState(false);
+  const [editingMeas, setEditingMeas] = useState<WorkplaceMeasurement | null>(null);
   const [importPreview, setImportPreview] = useState<{ rows: ParsedMeasRow[]; warnings: string[] } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const csvImportRef = useRef<HTMLInputElement>(null);
@@ -740,13 +756,22 @@ function RoundCard({
                 {filterDept ? `'${filterDept}' 부서의 측정 결과가 없어요.` : '등록된 측정 결과가 없어요.'}
               </div>
             ) : (
-              <MeasurementTable assessments={visible} onRemove={onMeasurementRemove} />
+              <MeasurementTable assessments={visible} onEdit={setEditingMeas} onRemove={onMeasurementRemove} />
             )}
           </div>
         </>
       )}
 
-      {showMeasModal && (
+      {editingMeas ? (
+        <MeasurementFormModal
+          roundId={round.id}
+          editing={editingMeas}
+          depts={depts}
+          deptHazards={deptHazards}
+          onSave={async (dto) => { await onMeasurementEdit(editingMeas.id, dto); setEditingMeas(null); }}
+          onClose={() => setEditingMeas(null)}
+        />
+      ) : showMeasModal ? (
         <MeasurementFormModal
           roundId={round.id}
           depts={depts}
@@ -754,7 +779,7 @@ function RoundCard({
           onSave={async (dto) => { await onMeasurementAdd(dto); setShowMeasModal(false); }}
           onClose={() => setShowMeasModal(false)}
         />
-      )}
+      ) : null}
 
       {importPreview && (
         <ImportPreviewModal
@@ -886,6 +911,11 @@ export function WorkplaceMeasurementPage() {
     refresh();
   }
 
+  async function handleMeasurementEdit(id: string, patch: Partial<Omit<WorkplaceMeasurement, 'id'>>) {
+    await measurement.update(id, patch);
+    refresh();
+  }
+
   function handleMeasurementRemove(id: string) {
     if (!confirm('이 측정 결과를 삭제할까요?')) return;
     measurement.remove(id).then(refresh);
@@ -959,6 +989,7 @@ export function WorkplaceMeasurementPage() {
               documents={data?.docsByRound.get(round.id) ?? []}
               filterDept={filterDept}
               onMeasurementAdd={handleMeasurementAdd}
+              onMeasurementEdit={handleMeasurementEdit}
               onMeasurementRemove={handleMeasurementRemove}
               onDocUpload={handleDocUpload}
               onDocRemove={handleDocRemove}

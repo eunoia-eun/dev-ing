@@ -51,6 +51,15 @@ export class WorkplaceMeasurementService {
     return filtered.map(assessMeasurement);
   }
 
+  async update(id: string, patch: Partial<Omit<WorkplaceMeasurement, 'id'>>): Promise<WorkplaceMeasurement> {
+    const all = await this.repo.list();
+    const existing = all.find((m) => m.id === id);
+    if (!existing) throw new Error('측정 결과를 찾을 수 없어요.');
+    const updated: WorkplaceMeasurement = { ...existing, ...patch };
+    await this.repo.save(updated);
+    return updated;
+  }
+
   async remove(id: string): Promise<void> {
     return this.repo.remove(id);
   }
