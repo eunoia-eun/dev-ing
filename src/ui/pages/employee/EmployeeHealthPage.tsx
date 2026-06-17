@@ -2,8 +2,13 @@ import { useState } from 'react';
 import {
   HEALTH_GRADE_LABEL,
   followUpLabels,
+  gradeCategory,
   gradeTone,
+  isLabAbnormal,
   resolveCheckupTypeName,
+  type CheckupTypeItem,
+  type HealthCheckup,
+  type LabItem,
 } from '@domain/checkup/HealthCheckup';
 import { SEVERITY_LABEL, type Severity } from '@domain/symptom/Symptom';
 import { useServices } from '../../ServicesContext';
@@ -47,6 +52,15 @@ export function EmployeeHealthPage() {
   return (
     <div>
       <h2 style={{ color: '#111827', fontSize: 16, margin: '0 0 12px', fontWeight: 900 }}>🩺 내 건강정보</h2>
+
+      {/* 이상소견 모아보기 */}
+      {checkups.length > 0 && (
+        <AbnormalFindingsBanner
+          checkups={checkups}
+          labItems={labCat.data ?? []}
+          checkupTypes={typeList}
+        />
+      )}
 
       {/* 건강검진 결과 */}
       <div className="emp-card">
@@ -304,5 +318,115 @@ function SymptomRecordModal({
         💡 기재한 내용은 보건관리자가 확인해요. 유해인자 노출과 연관성이 발견되면 함께 기록돼요.
       </div>
     </Modal>
+  );
+}
+
+/* ── 이상소견 모아보기 ── */
+function AbnormalFindingsBanner({
+  checkups,
+  labItems,
+  checkupTypes,
+}: {
+  checkups: HealthCheckup[];
+  labItems: LabItem[];
+  checkupTypes: CheckupTypeItem[];
+}) {
+  const abnormal = checkups.filter((c) => gradeCategory(c.grade) !== 'normal');
+
+  if (abnormal.length === 0) {
+    return (
+      <div
+        className="emp-card"
+        style={{ background: '#f0fdf4', border: '1.5px solid #86efac', marginBottom: 12 }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 24 }}>✅</span>
+          <div>
+            <div style={{ fontWeight: 700, color: '#15803d', fontSize: 13.5 }}>이상소견 없음</div>
+            <div style={{ fontSize: 12, color: '#166534', marginTop: 2 }}>
+              등록된 건강검진 결과가 모두 정상이에요.
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="emp-card"
+      style={{ background: '#fff7f7', border: '1.5px solid #fca5a5', marginBottom: 12 }}
+    >
+      <div
+        className="emp-card__title"
+        style={{ color: '#b91c1c', marginBottom: 10 }}
+      >
+        ⚠️ 이상소견 모아보기 ({abnormal.length}건)
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {abnormal.map((c) => {
+          const abnLabs = (c.labResults ?? []).filter((r) => {
+            const item = labItems.find((i) => i.id === r.code);
+            return isLabAbnormal(r.value, item);
+          });
+          const borderColor =
+            gradeCategory(c.grade) === 'finding'
+              ? '#ef4444'
+              : gradeCategory(c.grade) === 'recheck'
+              ? '#f59e0b'
+              : '#fb923c';
+          return (
+            <div
+              key={c.id}
+              style={{
+                borderLeft: `3px solid ${borderColor}`,
+                paddingLeft: 10,
+              }}
+            >
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+                <span className={`badge badge--${gradeTone(c.grade)}`} style={{ fontSize: 12 }}>
+                  {HEALTH_GRADE_LABEL[c.grade]}
+                </span>
+                <span style={{ fontSize: 12, color: '#6b7280' }}>
+                  {formatDate(c.examDate)} · {resolveCheckupTypeName(c.type, checkupTypes)}
+                </span>
+              </div>
+              {c.opinion && (
+                <div style={{ fontSize: 12.5, color: '#374151', marginBottom: 3 }}>
+                  소견: {c.opinion}
+                </div>
+              )}
+              {c.followUpActions && c.followUpActions.length > 0 && (
+                <div style={{ fontSize: 12, color: '#6b7280', marginBottom: 3 }}>
+                  사후관리: {followUpLabels(c.followUpActions)}
+                </div>
+              )}
+              {c.nextExamDate && (
+                <div style={{ fontSize: 12, color: '#2563eb', marginBottom: 3 }}>
+                  다음 검진 예정: {formatDate(c.nextExamDate)}
+                </div>
+              )}
+              {abnLabs.length > 0 && (
+                <div style={{ fontSize: 12, color: '#9a3412', marginTop: 2 }}>
+                  이상 수치:{' '}
+                  {abnLabs.map((r) => {
+                    const item = labItems.find((i) => i.id === r.code);
+                    const range = item
+                      ? [
+                          item.refLow != null ? `${item.refLow} 이상` : '',
+                          item.refHigh != null ? `${item.refHigh} 이하` : '',
+                        ]
+                          .filter(Boolean)
+                          .join(', ')
+                      : '';
+                    return `${r.name ?? r.code} ${r.value}${r.unit ?? ''}${range ? ` (정상 ${range})` : ''}`;
+                  }).join(' · ')}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
