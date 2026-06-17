@@ -15,6 +15,7 @@ const alias = {
 
 export default defineConfig({
   plugins: [react()],
+  base: '/dev-ing/',
   resolve: { alias },
   // 유해인자별 건강장해 데이터(hazardHealthDetails.json)는 동적 import로
   // 별도 청크가 되어 카탈로그 상세를 열 때만 로딩된다 → 경고 한도만 상향.
