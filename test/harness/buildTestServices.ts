@@ -34,6 +34,9 @@ import { FixedClock, SeqIdGenerator } from './fakes';
 import {
   InMemoryAccountRepository,
   InMemoryWorkplaceMeasurementRepository,
+  InMemoryMeasurementRoundRepository,
+  InMemoryMeasurementDocumentRepository,
+  InMemoryFileStore,
   InMemoryAssignmentRepository,
   InMemoryDepartmentRepository,
   InMemoryDepartmentHazardRepository,
@@ -179,7 +182,14 @@ export function buildTestServices(
       repos.enrollments,
       clock,
     ),
-    measurement: new WorkplaceMeasurementService(repos.workMeasurements, ids),
+    measurement: new WorkplaceMeasurementService(
+      repos.workMeasurements,
+      new InMemoryMeasurementRoundRepository(),
+      new InMemoryMeasurementDocumentRepository(),
+      new InMemoryFileStore(),
+      ids,
+      clock,
+    ),
   };
 
   return { services, repos, clock, ids };

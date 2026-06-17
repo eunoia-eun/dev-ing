@@ -7,6 +7,8 @@ export type ExceedanceStatus = 'normal' | 'warning' | 'exceeded' | 'unknown';
 
 export interface WorkplaceMeasurement {
   id: string;
+  /** 소속 측정 회차 ID */
+  roundId?: string;
   /** 측정일 (ISO 날짜) */
   measureDate: string;
   /** 측정 부서(공정) */

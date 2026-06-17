@@ -22,6 +22,8 @@ import { LocalStorageAccountRepository } from '@infrastructure/repositories/Loca
 import {
   LocalAssignmentRepository,
   LocalWorkplaceMeasurementRepository,
+  LocalMeasurementRoundRepository,
+  LocalMeasurementDocumentRepository,
   LocalDepartmentRepository,
   LocalDepartmentHazardRepository,
   LocalLabItemRepository,
@@ -36,6 +38,7 @@ import {
   LocalSymptomVisitRepository,
   LocalInventoryMovementRepository,
 } from '@infrastructure/repositories/localStorageRepositories';
+import { IndexedDbFileStore } from '@infrastructure/storage/IndexedDbFileStore';
 
 /**
  * 애플리케이션이 화면에 노출하는 서비스 묶음.
@@ -85,6 +88,9 @@ export function createAppServices(): AppServices {
   const accountRepo = new LocalStorageAccountRepository();
   const hasher = new WebCryptoHasher();
   const workMeasurementRepo = new LocalWorkplaceMeasurementRepository();
+  const measurementRoundRepo = new LocalMeasurementRoundRepository();
+  const measurementDocRepo = new LocalMeasurementDocumentRepository();
+  const fileStore = new IndexedDbFileStore();
 
   const employees = new EmployeeService(employeeRepo, ids);
   const symptom = new SymptomService(visitRepo, medicineRepo, movementRepo, clock, ids);
@@ -130,6 +136,6 @@ export function createAppServices(): AppServices {
       enrollmentRepo,
       clock,
     ),
-    measurement: new WorkplaceMeasurementService(workMeasurementRepo, ids),
+    measurement: new WorkplaceMeasurementService(workMeasurementRepo, measurementRoundRepo, measurementDocRepo, fileStore, ids, clock),
   };
 }

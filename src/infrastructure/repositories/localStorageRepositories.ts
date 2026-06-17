@@ -1,6 +1,11 @@
 import type { Employee, EmployeeId } from '@domain/employee/Employee';
 import type { WorkplaceMeasurement } from '@domain/measurement/WorkplaceMeasurement';
+import type { MeasurementRound, MeasurementDocument } from '@domain/measurement/MeasurementRound';
 import type { WorkplaceMeasurementRepository } from '@application/ports/WorkplaceMeasurementRepository';
+import type {
+  MeasurementRoundRepository,
+  MeasurementDocumentRepository,
+} from '@application/ports/MeasurementRoundRepository';
 import type { Assignment } from '@domain/employee/Assignment';
 import type { ExposureRecord } from '@domain/hazard/ExposureAssessment';
 import type { Medicine } from '@domain/symptom/Medicine';
@@ -321,6 +326,30 @@ export class LocalWorkplaceMeasurementRepository implements WorkplaceMeasurement
   }
   remove(id: string) {
     this.store.remove(id);
+    return Promise.resolve();
+  }
+}
+
+export class LocalMeasurementRoundRepository implements MeasurementRoundRepository {
+  private store = new LocalStorageStore<MeasurementRound>('measurementRounds', []);
+  list() { return Promise.resolve(this.store.all()); }
+  getById(id: string) { return Promise.resolve(this.store.byId(id)); }
+  save(r: MeasurementRound) { this.store.upsert(r); return Promise.resolve(); }
+  remove(id: string) { this.store.remove(id); return Promise.resolve(); }
+}
+
+export class LocalMeasurementDocumentRepository implements MeasurementDocumentRepository {
+  private store = new LocalStorageStore<MeasurementDocument>('measurementDocuments', []);
+  listByRound(roundId: string) {
+    return Promise.resolve(this.store.all().filter((d) => d.roundId === roundId));
+  }
+  getById(id: string) { return Promise.resolve(this.store.byId(id)); }
+  save(doc: MeasurementDocument) { this.store.upsert(doc); return Promise.resolve(); }
+  remove(id: string) { this.store.remove(id); return Promise.resolve(); }
+  removeByRound(roundId: string) {
+    this.store.all()
+      .filter((d) => d.roundId === roundId)
+      .forEach((d) => this.store.remove(d.id));
     return Promise.resolve();
   }
 }

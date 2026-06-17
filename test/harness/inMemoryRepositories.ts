@@ -10,8 +10,14 @@ import type { DepartmentHazard } from '@domain/hazard/DepartmentHazard';
 import type { InventoryMovement } from '@domain/inventory/InventoryMovement';
 import type { Account } from '@domain/auth/Account';
 import type { WorkplaceMeasurement } from '@domain/measurement/WorkplaceMeasurement';
+import type { MeasurementRound, MeasurementDocument } from '@domain/measurement/MeasurementRound';
 import type { Id } from '@domain/shared/types';
 import type { WorkplaceMeasurementRepository } from '@application/ports/WorkplaceMeasurementRepository';
+import type {
+  MeasurementRoundRepository,
+  MeasurementDocumentRepository,
+  FileStore,
+} from '@application/ports/MeasurementRoundRepository';
 
 import type { EmployeeRepository } from '@application/ports/EmployeeRepository';
 import type { AssignmentRepository } from '@application/ports/AssignmentRepository';
@@ -380,15 +386,39 @@ export class InMemoryWorkplaceMeasurementRepository implements WorkplaceMeasurem
   constructor(seed: WorkplaceMeasurement[] = []) {
     this.store = new InMemoryStore(seed);
   }
-  list() {
-    return Promise.resolve(this.store.all());
+  list() { return Promise.resolve(this.store.all()); }
+  save(m: WorkplaceMeasurement) { this.store.upsert(m); return Promise.resolve(); }
+  remove(id: string) { this.store.remove(id); return Promise.resolve(); }
+}
+
+export class InMemoryMeasurementRoundRepository implements MeasurementRoundRepository {
+  private store: InMemoryStore<MeasurementRound>;
+  constructor(seed: MeasurementRound[] = []) { this.store = new InMemoryStore(seed); }
+  list() { return Promise.resolve(this.store.all()); }
+  getById(id: string) { return Promise.resolve(this.store.byId(id)); }
+  save(r: MeasurementRound) { this.store.upsert(r); return Promise.resolve(); }
+  remove(id: string) { this.store.remove(id); return Promise.resolve(); }
+}
+
+export class InMemoryMeasurementDocumentRepository implements MeasurementDocumentRepository {
+  private store: InMemoryStore<MeasurementDocument>;
+  constructor(seed: MeasurementDocument[] = []) { this.store = new InMemoryStore(seed); }
+  listByRound(roundId: string) {
+    return Promise.resolve(this.store.all().filter((d) => d.roundId === roundId));
   }
-  save(m: WorkplaceMeasurement) {
-    this.store.upsert(m);
+  getById(id: string) { return Promise.resolve(this.store.byId(id)); }
+  save(doc: MeasurementDocument) { this.store.upsert(doc); return Promise.resolve(); }
+  remove(id: string) { this.store.remove(id); return Promise.resolve(); }
+  removeByRound(roundId: string) {
+    this.store.all().filter((d) => d.roundId === roundId).forEach((d) => this.store.remove(d.id));
     return Promise.resolve();
   }
-  remove(id: string) {
-    this.store.remove(id);
-    return Promise.resolve();
-  }
+}
+
+export class InMemoryFileStore implements FileStore {
+  private files = new Map<string, ArrayBuffer>();
+  async save(id: string, data: ArrayBuffer) { this.files.set(id, data); }
+  async load(id: string) { return this.files.get(id) ?? null; }
+  async remove(id: string) { this.files.delete(id); }
+  async removeMany(ids: string[]) { ids.forEach((id) => this.files.delete(id)); }
 }
