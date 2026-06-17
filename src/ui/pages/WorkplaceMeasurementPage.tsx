@@ -7,6 +7,7 @@ import type { MeasurementRound, MeasurementDocument } from '@domain/measurement/
 import { formatFileSize, suggestRoundName } from '@domain/measurement/MeasurementRound';
 import type { DepartmentHazard } from '@domain/hazard/DepartmentHazard';
 import type { HazardCategory, HazardCategoryCode, HazardSubstance } from '@domain/hazard/HazardousSubstance';
+import type { ParsedMeasRow } from '../utils/parseWorkplaceMeasurement';
 
 // ── 상태 뱃지 ─────────────────────────────────────────────────────────────
 const STATUS_MAP: Record<ExceedanceStatus, { label: string; color: string; bg: string }> = {
@@ -290,9 +291,9 @@ function MeasurementFormModal({
         </Field>
         <div className="field" style={{ marginBottom: 0 }}>
           <label>유해인자 *</label>
-          {chips.length > 0 && (
+          {chips.length > 0 ? (
             <div style={{ marginBottom: 6, padding: '8px 10px', background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb' }}>
-              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 5 }}>이 부서의 등록 유해인자</div>
+              <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 5 }}>이 부서의 등록 유해인자 (클릭하면 단위·기준값 자동 입력)</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
                 {chips.map((dh) => {
                   const code = `${dh.categoryCode}-${dh.substanceNo}`;
@@ -308,7 +309,14 @@ function MeasurementFormModal({
               </div>
               <div style={{ marginTop: 6, fontSize: 11, color: '#9ca3af' }}>목록에 없으면 아래에서 검색해 주세요.</div>
             </div>
-          )}
+          ) : form.department ? (
+            <div style={{ marginBottom: 6, padding: '8px 10px', background: '#fffbeb', borderRadius: 8, border: '1px solid #fde68a', fontSize: 12, color: '#92400e' }}>
+              이 부서에 등록된 유해인자가 없어요.
+              <span style={{ display: 'block', marginTop: 3, fontSize: 11, color: '#b45309' }}>
+                유해인자 카탈로그 → 부서별 유해인자(공정) 카드에서 먼저 등록하면 여기서 빠르게 선택할 수 있어요.
+              </span>
+            </div>
+          ) : null}
           <SubstancePicker value={pick} onSelect={handleSubstanceSelect} />
           {pick && !pick.limitTwa && !pick.limitStel && (
             <div style={{ marginTop: 4, fontSize: 11.5, color: '#d97706' }}>⚠ 이 물질의 기준 정보가 없어요. 단위와 기준값을 직접 입력해 주세요.</div>
@@ -341,6 +349,157 @@ function MeasurementFormModal({
           <button type="submit" className="btn btn--primary" disabled={saving}>{saving ? '등록 중...' : '등록'}</button>
         </div>
       </form>
+    </ModalWrap>
+  );
+}
+
+// ── Excel 가져오기 미리보기 모달 ──────────────────────────────────────────
+function ImportPreviewModal({
+  rows, warnings,
+  roundId, roundName,
+  depts,
+  onImport, onClose,
+}: {
+  rows: ParsedMeasRow[];
+  warnings: string[];
+  roundId: string;
+  roundName: string;
+  depts: Array<{ id: string; name: string }>;
+  onImport: (dtos: Omit<WorkplaceMeasurement, 'id'>[]) => Promise<void>;
+  onClose: () => void;
+}) {
+  const { hazard } = useServices();
+  const [editRows, setEditRows] = useState<ParsedMeasRow[]>(rows);
+  const [importing, setImporting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function updateRow(i: number, patch: Partial<ParsedMeasRow>) {
+    setEditRows((prev) => prev.map((r, idx) => idx === i ? { ...r, ...patch } : r));
+  }
+
+  function removeRow(i: number) {
+    setEditRows((prev) => prev.filter((_, idx) => idx !== i));
+  }
+
+  async function handleImport() {
+    setError(null);
+    const invalid = editRows.findIndex((r) => !r.substanceName.trim());
+    if (invalid >= 0) { setError(`${invalid + 1}번째 행에 유해인자명이 없어요.`); return; }
+    setImporting(true);
+    try {
+      const dtos: Omit<WorkplaceMeasurement, 'id'>[] = await Promise.all(
+        editRows.map(async (r) => {
+          // 유해인자명으로 카탈로그 검색 → 코드·기준값 자동 매핑
+          const searchResults = hazard.searchCatalog(r.substanceName.trim()).slice(0, 1);
+          let substanceCode = '';
+          let limitTwa = r.limitTwa.trim() || undefined;
+          let limitStel = r.limitStel.trim() || undefined;
+
+          if (searchResults.length > 0) {
+            const { category, substance } = searchResults[0];
+            substanceCode = `${category.code}-${substance.no}`;
+            if (!limitTwa || !limitStel) {
+              const detail = await hazard.getHealthDetail({ categoryCode: category.code, substanceNo: substance.no });
+              if (!limitTwa && detail?.exposureLimitKr?.twa)  limitTwa  = detail.exposureLimitKr.twa;
+              if (!limitStel && detail?.exposureLimitKr?.stel) limitStel = detail.exposureLimitKr.stel;
+            }
+          }
+
+          // 단위 추출 (기준값 문자열에서)
+          let unit = r.unit.trim();
+          if (!unit) {
+            const raw = limitTwa ?? limitStel ?? '';
+            const m = raw.replace(/^C\s+/i, '').match(/[\d.]+\s*(.+)/);
+            if (m) unit = m[1].trim().replace('㎎/㎥', 'mg/m³').replace('㎍/㎥', 'µg/m³').replace('㎎', 'mg');
+          }
+
+          return {
+            roundId,
+            measureDate:   r.measureDate || new Date().toISOString().slice(0, 10),
+            department:    r.department.trim(),
+            substanceCode: substanceCode || r.substanceName.trim(),
+            substanceName: r.substanceName.trim(),
+            unit:          unit || 'ppm',
+            twa:   r.twa  !== '' ? parseFloat(r.twa)  : undefined,
+            stel:  r.stel !== '' ? parseFloat(r.stel) : undefined,
+            limitTwa,
+            limitStel,
+            note: r.note.trim() || undefined,
+          };
+        })
+      );
+      await onImport(dtos);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+      setImporting(false);
+    }
+  }
+
+  return (
+    <ModalWrap title={`Excel에서 가져오기 — ${roundName}`} onClose={onClose} maxWidth={900}>
+      {warnings.length > 0 && (
+        <div style={{ marginBottom: 10, padding: '8px 12px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, fontSize: 12, color: '#92400e' }}>
+          {warnings.map((w, i) => <div key={i}>⚠ {w}</div>)}
+        </div>
+      )}
+      <div style={{ marginBottom: 8, fontSize: 13, color: '#6b7280' }}>
+        총 <strong>{editRows.length}건</strong>이 감지됐어요. 내용을 확인하고 수정한 뒤 가져오기를 눌러 주세요.
+      </div>
+      <div style={{ overflowX: 'auto', marginBottom: 12 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+          <thead>
+            <tr style={{ background: '#f9fafb', borderBottom: '2px solid #e5e7eb' }}>
+              {['측정일', '부서', '유해인자명', '단위', 'TWA 기준', 'STEL 기준', 'TWA 측정', 'STEL 측정', '비고', ''].map((h, i) => (
+                <th key={i} style={{ padding: '6px 8px', textAlign: 'left', fontWeight: 700, color: '#374151', whiteSpace: 'nowrap', fontSize: 11 }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {editRows.map((r, i) => (
+              <tr key={i} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                <td style={{ padding: '4px 4px' }}>
+                  <input className="input" style={{ fontSize: 11, padding: '3px 6px', minWidth: 96 }} type="date" value={r.measureDate} onChange={(e) => updateRow(i, { measureDate: e.target.value })} />
+                </td>
+                <td style={{ padding: '4px 4px' }}>
+                  <input className="input" style={{ fontSize: 11, padding: '3px 6px', minWidth: 80 }} list={`dept-import-${i}`} value={r.department} onChange={(e) => updateRow(i, { department: e.target.value })} />
+                  <datalist id={`dept-import-${i}`}>{depts.map((d) => <option key={d.id} value={d.name} />)}</datalist>
+                </td>
+                <td style={{ padding: '4px 4px' }}>
+                  <input className="input" style={{ fontSize: 11, padding: '3px 6px', minWidth: 100 }} value={r.substanceName} onChange={(e) => updateRow(i, { substanceName: e.target.value })} required />
+                </td>
+                <td style={{ padding: '4px 4px' }}>
+                  <input className="input" style={{ fontSize: 11, padding: '3px 6px', minWidth: 60 }} value={r.unit} onChange={(e) => updateRow(i, { unit: e.target.value })} placeholder="ppm" />
+                </td>
+                <td style={{ padding: '4px 4px' }}>
+                  <input className="input" style={{ fontSize: 11, padding: '3px 6px', minWidth: 70 }} value={r.limitTwa} onChange={(e) => updateRow(i, { limitTwa: e.target.value })} />
+                </td>
+                <td style={{ padding: '4px 4px' }}>
+                  <input className="input" style={{ fontSize: 11, padding: '3px 6px', minWidth: 70 }} value={r.limitStel} onChange={(e) => updateRow(i, { limitStel: e.target.value })} />
+                </td>
+                <td style={{ padding: '4px 4px' }}>
+                  <input className="input" type="number" style={{ fontSize: 11, padding: '3px 6px', minWidth: 60 }} value={r.twa} onChange={(e) => updateRow(i, { twa: e.target.value })} />
+                </td>
+                <td style={{ padding: '4px 4px' }}>
+                  <input className="input" type="number" style={{ fontSize: 11, padding: '3px 6px', minWidth: 60 }} value={r.stel} onChange={(e) => updateRow(i, { stel: e.target.value })} />
+                </td>
+                <td style={{ padding: '4px 4px' }}>
+                  <input className="input" style={{ fontSize: 11, padding: '3px 6px', minWidth: 70 }} value={r.note} onChange={(e) => updateRow(i, { note: e.target.value })} />
+                </td>
+                <td style={{ padding: '4px 4px' }}>
+                  <button type="button" className="btn btn--ghost btn--sm" style={{ color: '#ef4444', fontSize: 11 }} onClick={() => removeRow(i)}>삭제</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {error && <ErrorAlert message={error} />}
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <button type="button" className="btn btn--ghost" onClick={onClose}>취소</button>
+        <button type="button" className="btn btn--primary" disabled={importing || editRows.length === 0} onClick={handleImport}>
+          {importing ? '가져오는 중...' : `${editRows.length}건 가져오기`}
+        </button>
+      </div>
     </ModalWrap>
   );
 }
@@ -384,6 +543,21 @@ function MeasurementTable({
   );
 }
 
+// ── CSV 서식 다운로드 헬퍼 ────────────────────────────────────────────────
+function downloadCsvTemplate() {
+  const BOM = '﻿';
+  const header = '측정일,부서(공정),유해인자명,단위,TWA기준,STEL기준,TWA측정값,STEL측정값,비고';
+  const example1 = '2026-06-17,생산부,톨루엔,ppm,50 ppm,150 ppm,12,45,';
+  const example2 = '2026-06-17,생산부,노말헥산,ppm,50 ppm,,8,,정상';
+  const csv = BOM + header + '\n' + example1 + '\n' + example2 + '\n';
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '작업환경측정_입력서식.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 // ── 측정 회차 카드 ────────────────────────────────────────────────────────
 function RoundCard({
   round, measurements, documents, filterDept,
@@ -408,11 +582,16 @@ function RoundCard({
   const [expanded, setExpanded] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [showMeasModal, setShowMeasModal] = useState(false);
+  const [importPreview, setImportPreview] = useState<{ rows: ParsedMeasRow[]; warnings: string[] } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const csvImportRef = useRef<HTMLInputElement>(null);
 
   const visible = filterDept
     ? measurements.filter((m) => m.measurement.department === filterDept)
     : measurements;
+
+  const isExcel = (f: File) => /\.(xlsx|xls)$/i.test(f.name) || f.type.includes('spreadsheet') || f.type.includes('excel');
+  const isCsv   = (f: File) => /\.csv$/i.test(f.name) || f.type === 'text/csv';
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -420,9 +599,58 @@ function RoundCard({
     setUploading(true);
     try {
       await onDocUpload(round.id, file);
+      // Excel 파일이면 측정 데이터 자동 추출 시도
+      if (isExcel(file)) {
+        try {
+          const { parseWorkplaceMeasurementExcel } = await import('../utils/parseWorkplaceMeasurement');
+          const result = await parseWorkplaceMeasurementExcel(file);
+          if (result.rows.length > 0) {
+            setImportPreview({ rows: result.rows, warnings: result.warnings });
+          }
+        } catch {
+          // 파싱 실패 시 무시 (서류는 이미 저장됨)
+        }
+      }
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';
+    }
+  }
+
+  async function handleCsvImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      if (isExcel(file)) {
+        const { parseWorkplaceMeasurementExcel } = await import('../utils/parseWorkplaceMeasurement');
+        const result = await parseWorkplaceMeasurementExcel(file);
+        setImportPreview({ rows: result.rows, warnings: result.warnings });
+      } else if (isCsv(file)) {
+        // CSV 파싱 (BOM 제거)
+        const text = (await file.text()).replace(/^﻿/, '');
+        const lines = text.split('\n').filter((l) => l.trim());
+        if (lines.length < 2) return;
+        // 헤더: 측정일,부서,유해인자명,단위,TWA기준,STEL기준,TWA측정값,STEL측정값,비고
+        const rows: ParsedMeasRow[] = lines.slice(1).map((line) => {
+          const cols = line.split(',').map((c) => c.trim().replace(/^"|"$/g, ''));
+          return {
+            measureDate:   cols[0] ?? '',
+            department:    cols[1] ?? '',
+            substanceName: cols[2] ?? '',
+            unit:          cols[3] ?? '',
+            limitTwa:      cols[4] ?? '',
+            limitStel:     cols[5] ?? '',
+            twa:           cols[6] ?? '',
+            stel:          cols[7] ?? '',
+            note:          cols[8] ?? '',
+          };
+        }).filter((r) => r.substanceName || r.department);
+        setImportPreview({ rows, warnings: [] });
+      }
+    } catch (err) {
+      alert('파일을 읽을 수 없어요: ' + String(err));
+    } finally {
+      if (csvImportRef.current) csvImportRef.current.value = '';
     }
   }
 
@@ -471,7 +699,10 @@ function RoundCard({
               />
             </div>
             {documents.length === 0 ? (
-              <div style={{ fontSize: 12, color: '#9ca3af' }}>첨부된 서류가 없어요. PDF, Excel, 이미지 등을 업로드할 수 있어요.</div>
+              <div style={{ fontSize: 12, color: '#9ca3af' }}>
+                첨부된 서류가 없어요. PDF, Excel, 이미지 등을 업로드할 수 있어요.
+                <span style={{ marginLeft: 8, color: '#3b82f6' }}>※ Excel 파일 업로드 시 측정 결과를 자동으로 읽어와요.</span>
+              </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 {documents.map((doc) => (
@@ -491,9 +722,18 @@ function RoundCard({
 
           {/* 측정 결과 */}
           <div style={{ padding: '12px 16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, flexWrap: 'wrap', gap: 6 }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: '#374151' }}>📊 측정 결과</span>
-              <button className="btn btn--primary btn--sm" onClick={() => setShowMeasModal(true)}>＋ 측정결과 등록</button>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button className="btn btn--ghost btn--sm" style={{ fontSize: 12, color: '#6b7280' }} onClick={downloadCsvTemplate} title="Excel/CSV 입력 서식 내려받기">
+                  📋 서식 내려받기
+                </button>
+                <button className="btn btn--ghost btn--sm" style={{ fontSize: 12 }} onClick={() => csvImportRef.current?.click()} title="Excel 또는 CSV 파일로 일괄 가져오기">
+                  📥 일괄 가져오기
+                </button>
+                <input ref={csvImportRef} type="file" style={{ display: 'none' }} accept=".xlsx,.xls,.csv" onChange={handleCsvImport} />
+                <button className="btn btn--primary btn--sm" onClick={() => setShowMeasModal(true)}>＋ 직접 입력</button>
+              </div>
             </div>
             {visible.length === 0 ? (
               <div style={{ fontSize: 12, color: '#9ca3af' }}>
@@ -513,6 +753,21 @@ function RoundCard({
           deptHazards={deptHazards}
           onSave={async (dto) => { await onMeasurementAdd(dto); setShowMeasModal(false); }}
           onClose={() => setShowMeasModal(false)}
+        />
+      )}
+
+      {importPreview && (
+        <ImportPreviewModal
+          rows={importPreview.rows}
+          warnings={importPreview.warnings}
+          roundId={round.id}
+          roundName={round.name}
+          depts={depts}
+          onImport={async (dtos) => {
+            for (const dto of dtos) await onMeasurementAdd(dto);
+            setImportPreview(null);
+          }}
+          onClose={() => setImportPreview(null)}
         />
       )}
     </div>
