@@ -1,10 +1,16 @@
 import { useState } from 'react';
-import { gradeCategory, HEALTH_GRADE_LABEL } from '@domain/checkup/HealthCheckup';
+import {
+  HEALTH_GRADE_LABEL,
+  followUpLabels,
+  gradeTone,
+  resolveCheckupTypeName,
+} from '@domain/checkup/HealthCheckup';
 import { SEVERITY_LABEL, type Severity } from '@domain/symptom/Symptom';
 import { useServices } from '../../ServicesContext';
 import { useAsync } from '../../hooks/useAsync';
 import { Octopus } from '../../components/Octopus';
 import { ErrorAlert, Modal } from '../../components/ui';
+import { LabTrendCard } from '../../components/LabTrendCard';
 import { formatDate } from '../../format';
 import { useEmployeeId } from './EmployeeLayout';
 
@@ -16,13 +22,12 @@ const COMMON_SYMPTOMS = [
 
 export function EmployeeHealthPage() {
   const meId = useEmployeeId();
-  const { profile } = useServices();
+  const { profile, labItems, checkupTypes } = useServices();
   const [addOpen, setAddOpen] = useState(false);
 
-  const prof = useAsync(
-    () => profile.getProfile(meId),
-    [meId],
-  );
+  const prof = useAsync(() => profile.getProfile(meId), [meId]);
+  const labCat = useAsync(() => labItems.list(), []);
+  const types = useAsync(() => checkupTypes.list(), []);
 
   if (prof.loading) {
     return (
@@ -33,10 +38,11 @@ export function EmployeeHealthPage() {
     );
   }
 
-  const data       = prof.data;
-  const checkups   = data?.checkups ?? [];
-  const visits     = data?.recentVisits ?? [];
-  const exposures  = data?.exposures ?? [];
+  const data      = prof.data;
+  const checkups  = data?.checkups ?? [];
+  const visits    = data?.recentVisits ?? [];
+  const exposures = data?.exposures ?? [];
+  const typeList  = types.data ?? [];
 
   return (
     <div>
@@ -44,54 +50,73 @@ export function EmployeeHealthPage() {
 
       {/* 건강검진 결과 */}
       <div className="emp-card">
-        <div className="emp-card__title">최근 건강검진 결과</div>
+        <div className="emp-card__title">건강검진 결과</div>
         {checkups.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '14px 0', color: '#9ca3af', fontSize: 12.5 }}>
             <span style={{ fontSize: 30, display: 'block', marginBottom: 6 }}>📋</span>
             건강검진 기록이 없어요
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {checkups.slice(0, 4).map((c) => {
-              const cat = gradeCategory(c.grade);
-              return (
-                <div
-                  key={c.id}
-                  style={{ display: 'flex', gap: 12, alignItems: 'center' }}
-                >
-                  <div className={`emp-grade-card emp-grade-card--${cat}`} style={{ padding: '8px 12px', minWidth: 52, flexShrink: 0 }}>
-                    <div style={{ fontSize: 22, fontWeight: 900, lineHeight: 1 }}>{c.grade}</div>
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 13.5, color: '#1f2937' }}>
-                      {HEALTH_GRADE_LABEL[c.grade]}
-                    </div>
-                    <div style={{ fontSize: 11.5, color: '#9ca3af' }}>{formatDate(c.examDate)}</div>
-                    {c.opinion && (
-                      <div style={{ fontSize: 12, color: '#374151', marginTop: 3, lineHeight: 1.5 }}>
-                        {c.opinion}
-                      </div>
-                    )}
-                    {c.nextExamDate && (
-                      <div style={{ fontSize: 11.5, color: '#2563eb', marginTop: 3 }}>
-                        다음 검진 예정: {formatDate(c.nextExamDate)}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-            {checkups.length > 4 && (
-              <div style={{ fontSize: 11.5, color: '#9ca3af', textAlign: 'center' }}>
-                외 {checkups.length - 4}건 더 있음
-              </div>
-            )}
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #e5e7eb' }}>
+                  <th style={{ textAlign: 'left', padding: '6px 8px', color: '#6b7280', fontWeight: 600 }}>검진일</th>
+                  <th style={{ textAlign: 'left', padding: '6px 8px', color: '#6b7280', fontWeight: 600 }}>종류</th>
+                  <th style={{ textAlign: 'left', padding: '6px 8px', color: '#6b7280', fontWeight: 600 }}>판정</th>
+                  <th style={{ textAlign: 'left', padding: '6px 8px', color: '#6b7280', fontWeight: 600 }}>사후관리</th>
+                  <th style={{ textAlign: 'left', padding: '6px 8px', color: '#6b7280', fontWeight: 600 }}>소견 / 다음 검진</th>
+                </tr>
+              </thead>
+              <tbody>
+                {checkups.map((c) => (
+                  <tr key={c.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                    <td style={{ padding: '8px 8px', whiteSpace: 'nowrap', color: '#374151' }}>
+                      {formatDate(c.examDate)}
+                    </td>
+                    <td style={{ padding: '8px 8px', color: '#374151' }}>
+                      {resolveCheckupTypeName(c.type, typeList)}
+                    </td>
+                    <td style={{ padding: '8px 8px' }}>
+                      <span className={`badge badge--${gradeTone(c.grade)}`} style={{ fontSize: 12 }}>
+                        {HEALTH_GRADE_LABEL[c.grade]}
+                      </span>
+                    </td>
+                    <td style={{ padding: '8px 8px', color: '#374151' }}>
+                      {c.followUpActions && c.followUpActions.length > 0
+                        ? followUpLabels(c.followUpActions)
+                        : <span style={{ color: '#9ca3af' }}>-</span>}
+                    </td>
+                    <td style={{ padding: '8px 8px', color: '#374151' }}>
+                      {c.opinion ?? ''}
+                      {c.nextExamDate && (
+                        <div style={{ fontSize: 11.5, color: '#2563eb', marginTop: 2 }}>
+                          다음 검진 {formatDate(c.nextExamDate)}
+                        </div>
+                      )}
+                      {!c.opinion && !c.nextExamDate && <span style={{ color: '#9ca3af' }}>-</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
 
+      {/* 검사 수치 추이 (5개년 기본값) */}
+      {checkups.length > 0 && (
+        <div style={{ marginTop: 12 }}>
+          <LabTrendCard
+            checkups={checkups}
+            labItems={labCat.data ?? []}
+            checkupTypes={typeList}
+          />
+        </div>
+      )}
+
       {/* 증상 기재 */}
-      <div className="emp-card">
+      <div className="emp-card" style={{ marginTop: 12 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
           <div className="emp-card__title" style={{ marginBottom: 0 }}>증상 기재</div>
           <button
@@ -179,7 +204,6 @@ function SymptomRecordModal({
     setBusy(true);
     setError(null);
     try {
-      // 노출 유해인자와 증상 교차 확인
       const activeExposures = exposures.filter((ex) => ex.status !== 'ended');
       let hazardFindings = undefined;
       if (activeExposures.length > 0) {
