@@ -407,20 +407,49 @@ function AbnormalFindingsBanner({
                 </div>
               )}
               {abnLabs.length > 0 && (
-                <div style={{ fontSize: 12, color: '#9a3412', marginTop: 2 }}>
-                  이상 수치:{' '}
-                  {abnLabs.map((r) => {
-                    const item = labItems.find((i) => i.id === r.code);
-                    const range = item
-                      ? [
-                          item.refLow != null ? `${item.refLow} 이상` : '',
-                          item.refHigh != null ? `${item.refHigh} 이하` : '',
-                        ]
-                          .filter(Boolean)
-                          .join(', ')
-                      : '';
-                    return `${r.name ?? r.code} ${r.value}${r.unit ?? ''}${range ? ` (정상 ${range})` : ''}`;
-                  }).join(' · ')}
+                <div style={{ marginTop: 6 }}>
+                  <div style={{ fontSize: 11.5, color: '#9a3412', fontWeight: 600, marginBottom: 4 }}>
+                    이상 수치 ({abnLabs.length}건)
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    {abnLabs.map((r) => {
+                      const item = labItems.find((i) => i.id === r.code);
+                      const rangeStr =
+                        item?.refLow != null && item?.refHigh != null
+                          ? `${item.refLow}~${item.refHigh}`
+                          : item?.refLow != null
+                          ? `${item.refLow} 이상`
+                          : item?.refHigh != null
+                          ? `${item.refHigh} 이하`
+                          : '';
+                      return (
+                        <div
+                          key={r.code}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'baseline',
+                            background: '#fff1f2',
+                            borderRadius: 6,
+                            padding: '4px 8px',
+                            gap: 8,
+                          }}
+                        >
+                          <span style={{ fontSize: 12, color: '#374151', flexShrink: 0 }}>
+                            {r.name ?? r.code}
+                          </span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: '#b91c1c', flexShrink: 0 }}>
+                            {r.value}{r.unit ?? ''}
+                          </span>
+                          {rangeStr && (
+                            <span style={{ fontSize: 11, color: '#9ca3af', flexShrink: 0 }}>
+                              정상 {rangeStr}{r.unit ?? ''}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>
